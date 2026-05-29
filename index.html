@@ -700,7 +700,7 @@ const SECTORS = [
  
 const MACRO_TICKERS = ["SPY","QQQ","GLD"];
 const JOURNAL = [];
-let API_KEY = localStorage.getItem('polygonKey') || '';
+let API_KEY = localStorage.getItem('polygonKey') || 'KKuNI_vw9qqAMKpRR6V1AmogsnEzZ77S';
 let tickerData = {};
 let refreshInterval = null;
 let countdownInterval = null;
@@ -711,13 +711,9 @@ let openSectors = new Set();
 window.onload = () => {
   buildSectorCards();
   updateMarketStatus();
- 
-  if (API_KEY) {
-    document.getElementById('apiKeyInput').value = API_KEY;
-    document.getElementById('apiSetup').style.display = 'none';
-    fetchAllData();
-    startRefreshTimer();
-  }
+  document.getElementById('apiSetup').style.display = 'none';
+  fetchAllData();
+  startRefreshTimer();
 };
  
 function connectAPI() {
