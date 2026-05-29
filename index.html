@@ -700,7 +700,7 @@ const SECTORS = [
  
 const MACRO_TICKERS = ["SPY","QQQ","GLD"];
 const JOURNAL = [];
-let API_KEY = localStorage.getItem('polygonKey') || 'KKuNI_vw9qqAMKpRR6V1AmogsnEzZ77S';
+let API_KEY = localStorage.getItem('polygonKey') || 'MRkia9WkO2ZWYFp8CRHs6RZwsqX4r7xe';
 let tickerData = {};
 let refreshInterval = null;
 let countdownInterval = null;
@@ -823,25 +823,26 @@ async function fetchAllData() {
 }
  
 async function fetchSnapshot(tickers) {
-  const symbols = tickers.join(',');
-  const url = `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?tickers=${symbols}&apiKey=${API_KEY}`)}`;
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-    if (data.tickers) {
-      data.tickers.forEach(t => {
-        tickerData[t.ticker] = {
-          price: t.day?.c || t.lastTrade?.p || 0,
-          open: t.day?.o || 0,
-          prevClose: t.prevDay?.c || 0,
-          pct: t.todaysChangePerc || 0,
-          vol: t.day?.v || 0,
-          prevVol: t.prevDay?.v || 0,
-        };
-      });
+  for (const sym of tickers) {
+    try {
+      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${sym}?interval=1d&range=2d`;
+      const proxy = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+      const res = await fetch(proxy);
+      const data = await res.json();
+      const result = data?.chart?.result?.[0];
+      if (!result) continue;
+      const meta = result.meta;
+      const prevClose = meta.chartPreviousClose || meta.previousClose || 0;
+      const price = meta.regularMarketPrice || 0;
+      const pct = prevClose > 0 ? ((price - prevClose) / prevClose * 100) : 0;
+      const vol = meta.regularMarketVolume || 0;
+      const quotes = result.indicators?.quote?.[0];
+      const volumes = quotes?.volume || [];
+      const prevVol = volumes.length > 1 ? (volumes[volumes.length - 2] || 0) : 0;
+      tickerData[sym] = { price, prevClose, pct, vol, prevVol };
+    } catch(e) {
+      console.error('Fetch error:', sym, e);
     }
-  } catch(e) {
-    console.error('Fetch error:', e);
   }
 }
  
@@ -1082,3 +1083,4 @@ setInterval(updateMarketStatus, 60000);
 </script>
 </body>
 </html>
+ 
