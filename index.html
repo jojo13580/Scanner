@@ -601,7 +601,7 @@
 </head>
 <body>
  
-<div class="loading-overlay" id="loadingOverlay" style="display:none">
+<div class="loading-overlay" id="loadingOverlay" style="display:none!important">
   <div class="spinner"></div>
   <div class="loading-text" id="loadingText">Chargement des données...</div>
 </div>
@@ -797,7 +797,7 @@ function toggleJournal() {
 // ==================== FETCH DATA ====================
 async function fetchAllData() {
   if (!API_KEY) return;
-  showLoading(true, 'Chargement des données...');
+  // loading disabled
  
   // Get all unique tickers
   const allTickers = new Set();
@@ -807,18 +807,16 @@ async function fetchAllData() {
   const tickerList = [...allTickers];
  
   try {
-    // Fetch snapshot for all tickers
-    const chunks = chunkArray(tickerList, 20);
+    const chunks = chunkArray(tickerList, 15);
     for (const chunk of chunks) {
       await fetchSnapshot(chunk);
+      updateAllSectors();
+      updateMacro();
+      updateStats();
     }
-    updateAllSectors();
-    updateMacro();
-    updateStats();
   } catch(e) {
     console.error(e);
   }
- 
   showLoading(false);
 }
  
