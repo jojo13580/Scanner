@@ -1,437 +1,338 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sector Scanner</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c10;
+    --panel: #0d1117;
+    --border: #1a2332;
+    --green: #00ff88;
+    --red: #ff3355;
+    --yellow: #ffcc00;
+    --text: #e0e8f0;
+    --muted: #4a6080;
+    --alert: #00ff88;
   }
 
-  /* HEADER */
-  .header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(5,8,13,0.97);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border);
-    padding: 10px 14px;
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    padding: 16px;
+    background-image: radial-gradient(ellipse at 20% 0%, #001a0e22 0%, transparent 60%),
+                      radial-gradient(ellipse at 80% 100%, #0a001a22 0%, transparent 60%);
+  }
+
+  header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
   }
 
   .logo {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 800;
-    letter-spacing: 0.1em;
-    color: var(--white);
-  }
-  .logo span { color: var(--green); }
-
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .live-pill {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    background: #00e67615;
-    border: 1px solid #00e67630;
-    border-radius: 20px;
-    padding: 4px 10px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
     color: var(--green);
   }
 
+  .logo span { color: var(--text); }
+
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--green);
+    background: #00ff8815;
+    border: 1px solid #00ff8830;
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+
   .live-dot {
-    width: 6px; height: 6px;
+    width: 7px; height: 7px;
     background: var(--green);
     border-radius: 50%;
-    animation: blink 1.4s infinite;
+    animation: pulse 1.5s infinite;
   }
 
-  @keyframes blink {
-    0%,100% { opacity:1; } 50% { opacity:0.2; }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
   }
 
-  .market-status {
-    font-family: 'IBM Plex Mono', monospace;
+  .refresh-info {
+    font-family: 'Space Mono', monospace;
     font-size: 10px;
-    padding: 4px 8px;
-    border-radius: 6px;
-    border: 1px solid;
-  }
-  .market-status.open { color: var(--green); border-color: #00e67630; background: #00e67610; }
-  .market-status.closed { color: var(--red); border-color: #ff174430; background: #ff174410; }
-
-  /* API KEY INPUT */
-  .api-setup {
-    margin: 12px;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
-
-  .api-setup input {
-    flex: 1;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 8px 10px;
-    color: var(--text);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    outline: none;
-  }
-
-  .api-setup input:focus { border-color: var(--green); }
-
-  .btn-connect {
-    background: var(--green);
-    color: #000;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 14px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    white-space: nowrap;
-  }
-
-  /* MACRO BLOC */
-  .macro-strip {
-    display: flex;
-    gap: 8px;
-    padding: 0 12px 12px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .macro-strip::-webkit-scrollbar { display: none; }
-
-  .macro-tile {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 8px 12px;
-    min-width: 90px;
-    flex-shrink: 0;
-  }
-
-  .macro-name {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px;
     color: var(--muted);
-    margin-bottom: 3px;
+    text-align: right;
   }
-
-  .macro-price {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--white);
-  }
-
-  .macro-chg {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    margin-top: 2px;
-  }
-
-  .macro-chg.up { color: var(--green); }
-  .macro-chg.down { color: var(--red); }
 
   /* ALERT BANNER */
   .alert-banner {
-    margin: 0 12px 12px;
-    background: linear-gradient(135deg, #00e67618, #00e67605);
+    background: linear-gradient(135deg, #00ff8820, #00ff8808);
     border: 1px solid var(--green);
     border-radius: 12px;
-    padding: 12px 14px;
-    display: none;
-    animation: glowPulse 2s infinite;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    animation: alertGlow 2s infinite;
   }
 
-  .alert-banner.visible { display: flex; align-items: center; gap: 10px; }
-
-  @keyframes glowPulse {
-    0%,100% { box-shadow: 0 0 12px #00e67625; }
-    50% { box-shadow: 0 0 25px #00e67650; }
+  @keyframes alertGlow {
+    0%, 100% { box-shadow: 0 0 15px #00ff8830; }
+    50% { box-shadow: 0 0 30px #00ff8860; }
   }
 
-  .alert-icon { font-size: 24px; }
-  .alert-body { flex: 1; }
-  .alert-title { font-size: 16px; font-weight: 800; color: var(--green); letter-spacing: 0.05em; }
-  .alert-sub { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 2px; }
-  .alert-time { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--green); }
+  .alert-icon { font-size: 22px; }
 
-  /* STATS ROW */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    padding: 0 12px 12px;
+  .alert-text { flex: 1; }
+  .alert-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--green);
+    letter-spacing: 0.05em;
   }
-
-  .stat-box {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 8px;
-    text-align: center;
-  }
-
-  .stat-val {
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--white);
-  }
-  .stat-val.green { color: var(--green); }
-  .stat-val.yellow { color: var(--yellow); }
-  .stat-val.orange { color: var(--orange); }
-
-  .stat-lbl {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 8px;
+  .alert-sub {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
     color: var(--muted);
     margin-top: 2px;
-    text-transform: uppercase;
   }
 
-  /* SECTOR CARDS */
-  .sectors-wrap {
-    padding: 0 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding-bottom: 100px;
+  .alert-time {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    color: var(--green);
+    background: #00ff8815;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+
+  /* SECTOR GRID */
+  .sectors-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  @media (min-width: 600px) {
+    .sectors-grid { grid-template-columns: repeat(3, 1fr); }
   }
 
   .sector-card {
     background: var(--panel);
     border: 1px solid var(--border);
     border-radius: 14px;
-    overflow: hidden;
-    transition: border-color 0.3s;
-  }
-
-  .sector-card.signal-ultimate {
-    border-color: var(--green);
-    box-shadow: 0 0 20px #00e67620;
-  }
-
-  .sector-card.signal-partial {
-    border-color: var(--yellow);
-  }
-
-  .sector-card.signal-volume {
-    border-color: var(--blue);
-  }
-
-  .sector-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 14px;
-    cursor: pointer;
+    padding: 14px;
     position: relative;
+    overflow: hidden;
+    transition: transform 0.2s;
   }
 
-  .sector-header::before {
+  .sector-card:active { transform: scale(0.97); }
+
+  .sector-card.signal {
+    border-color: var(--green);
+    background: linear-gradient(135deg, #00ff8810, var(--panel));
+  }
+
+  .sector-card.signal::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 2px;
-    background: var(--border);
-    transition: background 0.3s;
+    background: var(--green);
   }
 
-  .sector-card.signal-ultimate .sector-header::before { background: var(--green); }
-  .sector-card.signal-partial .sector-header::before { background: var(--yellow); }
-  .sector-card.signal-volume .sector-header::before { background: var(--blue); }
+  .sector-card.partial {
+    border-color: #ffcc0040;
+  }
 
-  .sector-left { flex: 1; }
+  .sector-card.partial::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--yellow);
+  }
 
   .sector-name {
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 700;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--white);
-  }
-
-  .sector-meta {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px;
-    color: var(--muted);
-    margin-top: 2px;
-  }
-
-  .sector-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  /* SCORE CIRCLE */
-  .score-circle {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    border: 2px solid var(--border);
-    position: relative;
-    flex-shrink: 0;
-  }
-
-  .score-val {
-    font-size: 16px;
-    font-weight: 800;
-    line-height: 1;
-  }
-
-  .score-label {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 7px;
-    color: var(--muted);
-  }
-
-  .score-0 { border-color: var(--muted); }
-  .score-0 .score-val { color: var(--muted); }
-  .score-low { border-color: var(--red); }
-  .score-low .score-val { color: var(--red); }
-  .score-mid { border-color: var(--yellow); }
-  .score-mid .score-val { color: var(--yellow); }
-  .score-high { border-color: var(--orange); }
-  .score-high .score-val { color: var(--orange); }
-  .score-max { border-color: var(--green); box-shadow: 0 0 10px #00e67640; }
-  .score-max .score-val { color: var(--green); }
-
-  .signal-badges {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
-
-  .badge {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 8px;
-    padding: 2px 6px;
-    border-radius: 4px;
-    border: 1px solid;
-    white-space: nowrap;
-  }
-
-  .badge-green { color: var(--green); border-color: #00e67630; background: #00e67610; }
-  .badge-yellow { color: var(--yellow); border-color: #ffab0030; background: #ffab0010; }
-  .badge-blue { color: var(--blue); border-color: #2979ff30; background: #2979ff10; }
-  .badge-red { color: var(--red); border-color: #ff174430; background: #ff174410; }
-  .badge-muted { color: var(--muted); border-color: var(--border); }
-
-  /* TICKER LIST */
-  .sector-body {
-    padding: 0 14px 12px;
-    display: none;
-  }
-
-  .sector-body.open { display: block; }
-
-  .ticker-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
     margin-bottom: 10px;
+    color: var(--text);
   }
 
-  .ticker-item {
-    background: var(--panel2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 6px 10px;
-    min-width: 90px;
+  .sector-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 8px;
   }
 
-  .ticker-sym {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--white);
-  }
-
-  .ticker-pct {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
+  .status-pill {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 20px;
     font-weight: 700;
-    margin-top: 2px;
-  }
-  .ticker-pct.up { color: var(--green); }
-  .ticker-pct.down { color: var(--red); }
-  .ticker-pct.flat { color: var(--muted); }
-
-  .ticker-vol {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px;
-    margin-top: 2px;
-  }
-  .ticker-vol.over { color: var(--green); }
-  .ticker-vol.under { color: var(--muted); }
-
-  .ticker-item.ultimate {
-    border-color: var(--green);
-    background: #00e67608;
   }
 
-  /* VOLUME BAR */
-  .vol-section {
+  .status-pill.green-all {
+    background: #00ff8820;
+    color: var(--green);
+    border: 1px solid #00ff8840;
+  }
+
+  .status-pill.partial {
+    background: #ffcc0015;
+    color: var(--yellow);
+    border: 1px solid #ffcc0030;
+  }
+
+  .status-pill.red {
+    background: #ff335515;
+    color: var(--red);
+    border: 1px solid #ff335530;
+  }
+
+  .volume-bar-wrap {
     margin-top: 8px;
   }
 
-  .vol-header {
-    display: flex;
-    justify-content: space-between;
-    font-family: 'IBM Plex Mono', monospace;
+  .volume-label {
+    font-family: 'Space Mono', monospace;
     font-size: 9px;
     color: var(--muted);
     margin-bottom: 4px;
+    display: flex;
+    justify-content: space-between;
   }
 
-  .vol-bar {
-    height: 5px;
+  .volume-bar {
+    height: 4px;
     background: var(--border);
-    border-radius: 3px;
+    border-radius: 2px;
     overflow: hidden;
   }
 
-  .vol-fill {
+  .volume-fill {
     height: 100%;
-    border-radius: 3px;
-    transition: width 0.6s ease;
+    border-radius: 2px;
+    transition: width 0.5s ease;
   }
 
-  .vol-fill.over { background: var(--green); }
-  .vol-fill.under { background: var(--muted); }
-  .vol-fill.partial { background: var(--yellow); }
+  .volume-fill.over { background: var(--green); }
+  .volume-fill.under { background: var(--muted); }
 
-  /* REFRESH BAR */
+  .sector-tickers {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .ticker-chip {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .ticker-chip.up {
+    border-color: #00ff8830;
+    color: var(--green);
+    background: #00ff8808;
+  }
+
+  .ticker-chip.down {
+    border-color: #ff335530;
+    color: var(--red);
+    background: #ff335508;
+  }
+
+  /* SIGNAL INDICATOR */
+  .signal-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 16px;
+    animation: bounce 1s infinite;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+
+  /* BOTTOM STATS */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .stat-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+  }
+
+  .stat-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .stat-val.green { color: var(--green); }
+  .stat-val.yellow { color: var(--yellow); }
+
+  .stat-label {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* REFRESH COUNTDOWN */
   .refresh-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0; right: 0;
-    background: rgba(5,8,13,0.97);
-    border-top: 1px solid var(--border);
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
     padding: 10px 14px;
     display: flex;
     align-items: center;
     gap: 10px;
-    z-index: 100;
   }
 
-  .refresh-lbl {
-    font-family: 'IBM Plex Mono', monospace;
+  .refresh-label {
+    font-family: 'Space Mono', monospace;
     font-size: 10px;
     color: var(--muted);
     white-space: nowrap;
@@ -445,612 +346,175 @@
     overflow: hidden;
   }
 
-  .refresh-fill {
+  .refresh-progress {
     height: 100%;
     background: var(--green);
     border-radius: 2px;
+    animation: countdown 60s linear infinite;
     width: 100%;
-    transition: width 1s linear;
+  }
+
+  @keyframes countdown {
+    from { width: 100%; }
+    to { width: 0%; }
   }
 
   .refresh-timer {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
     color: var(--green);
-    min-width: 28px;
+    min-width: 30px;
     text-align: right;
-  }
-
-  .btn-refresh {
-    background: var(--panel2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 5px 10px;
-    color: var(--text);
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 13px;
-    cursor: pointer;
-  }
-
-  /* JOURNAL */
-  .journal-section {
-    margin: 0 12px 12px;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-  }
-
-  .journal-header {
-    padding: 10px 14px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--border);
-    cursor: pointer;
-  }
-
-  .journal-title {
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-
-  .journal-body {
-    padding: 10px 14px;
-    display: none;
-    max-height: 200px;
-    overflow-y: auto;
-  }
-
-  .journal-body.open { display: block; }
-
-  .journal-entry {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    color: var(--text);
-    padding: 6px 0;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    gap: 8px;
-  }
-
-  .journal-entry:last-child { border-bottom: none; }
-  .je-time { color: var(--muted); white-space: nowrap; }
-  .je-sector { color: var(--green); }
-  .je-score { color: var(--yellow); }
-
-  .empty-journal {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    color: var(--muted);
-    text-align: center;
-    padding: 20px;
-  }
-
-  .loading-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(5,8,13,0.85);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 200;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .spinner {
-    width: 40px; height: 40px;
-    border: 3px solid var(--border);
-    border-top-color: var(--green);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .loading-text {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-    color: var(--green);
-  }
-
-  .section-title {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    padding: 0 12px 8px;
   }
 </style>
 </head>
 <body>
 
-<div class="loading-overlay" id="loadingOverlay" style="display:none">
-  <div class="spinner"></div>
-  <div class="loading-text" id="loadingText">Chargement des données...</div>
-</div>
-
-<!-- HEADER -->
-<div class="header">
-  <div class="logo">SECTOR<span>SCAN</span></div>
-  <div class="header-right">
-    <div class="market-status" id="marketStatus">--</div>
-    <div class="live-pill">
+<header>
+  <div class="logo">Sector<span>Scan</span></div>
+  <div>
+    <div class="live-badge">
       <div class="live-dot"></div>
       LIVE
     </div>
+    <div class="refresh-info" style="margin-top:4px">Polygon.io · Temps réel</div>
   </div>
-</div>
+</header>
 
-<!-- API KEY -->
-<div class="api-setup" id="apiSetup">
-  <input type="password" id="apiKeyInput" placeholder="Colle ta clé API Polygon.io ici..." />
-  <button class="btn-connect" onclick="connectAPI()">CONNECTER</button>
-</div>
-
-<!-- ALERT BANNER -->
-<div class="alert-banner" id="alertBanner">
+<!-- ALERTE ACTIVE -->
+<div class="alert-banner">
   <div class="alert-icon">🚨</div>
-  <div class="alert-body">
-    <div class="alert-title" id="alertTitle">SIGNAL ULTIME</div>
-    <div class="alert-sub" id="alertSub">--</div>
+  <div class="alert-text">
+    <div class="alert-title">SIGNAL DÉTECTÉ — DRONE</div>
+    <div class="alert-sub">Tous les tickers dans le vert · Volume secteur +147% vs veille</div>
   </div>
-  <div class="alert-time" id="alertTime">--</div>
+  <div class="alert-time">14:26</div>
 </div>
 
-<!-- MACRO -->
-<div class="section-title">MACRO</div>
-<div class="macro-strip" id="macroStrip">
-  <div class="macro-tile"><div class="macro-name">S&P 500</div><div class="macro-price" id="m-spy">--</div><div class="macro-chg" id="mc-spy">--</div></div>
-  <div class="macro-tile"><div class="macro-name">NASDAQ</div><div class="macro-price" id="m-qqq">--</div><div class="macro-chg" id="mc-qqq">--</div></div>
-  <div class="macro-tile"><div class="macro-name">BITCOIN</div><div class="macro-price" id="m-btc">--</div><div class="macro-chg" id="mc-btc">--</div></div>
-  <div class="macro-tile"><div class="macro-name">OR</div><div class="macro-price" id="m-gld">--</div><div class="macro-chg" id="mc-gld">--</div></div>
-  <div class="macro-tile"><div class="macro-name">VIX</div><div class="macro-price" id="m-vix">--</div><div class="macro-chg" id="mc-vix">--</div></div>
-</div>
-
-<!-- STATS -->
+<!-- STATS GLOBALES -->
 <div class="stats-row">
-  <div class="stat-box"><div class="stat-val green" id="st-ultimate">0</div><div class="stat-lbl">ULTIME 🚨</div></div>
-  <div class="stat-box"><div class="stat-val orange" id="st-partial">0</div><div class="stat-lbl">FORT 🟠</div></div>
-  <div class="stat-box"><div class="stat-val yellow" id="st-volume">0</div><div class="stat-lbl">VOL OK 🟡</div></div>
-  <div class="stat-box"><div class="stat-val" id="st-total">18</div><div class="stat-lbl">SECTEURS</div></div>
-</div>
-
-<!-- JOURNAL -->
-<div class="journal-section">
-  <div class="journal-header" onclick="toggleJournal()">
-    <div class="journal-title">📋 Journal de bord</div>
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted)" id="journalCount">0 signaux</div>
+  <div class="stat-box">
+    <div class="stat-val green">1</div>
+    <div class="stat-label">Signal actif</div>
   </div>
-  <div class="journal-body" id="journalBody">
-    <div class="empty-journal" id="emptyJournal">Aucun signal enregistré pour l'instant</div>
+  <div class="stat-box">
+    <div class="stat-val yellow">2</div>
+    <div class="stat-label">En approche</div>
+  </div>
+  <div class="stat-box">
+    <div class="stat-val">4</div>
+    <div class="stat-label">Secteurs</div>
   </div>
 </div>
 
-<!-- SECTORS -->
-<div class="section-title" style="margin-top:12px">SECTEURS</div>
-<div class="sectors-wrap" id="sectorsWrap"></div>
+<!-- SECTEURS -->
+<div class="sectors-grid">
 
-<!-- REFRESH BAR -->
-<div class="refresh-bar">
-  <div class="refresh-lbl">REFRESH</div>
-  <div class="refresh-track"><div class="refresh-fill" id="refreshFill"></div></div>
-  <div class="refresh-timer" id="refreshTimer">60s</div>
-  <button class="btn-refresh" onclick="fetchAllData()">↻</button>
-</div>
-
-<script>
-// ==================== CONFIG ====================
-const SECTORS = [
-  { name: "QUANTIQUE", tickers: ["IONQ","RGTI","QBTS","QUBT","ARQQ"] },
-  { name: "LIDAR +", tickers: ["HSAI","OUST","INVZ","AEVA"] },
-  { name: "LIDAR -", tickers: ["HSAI","OUST","INVZ","EEVA","MVIS","LIDR"] },
-  { name: "MINÉRAUX LARGES", tickers: ["MP","UAMY","UUUU","USAR"] },
-  { name: "LITHIUM", tickers: ["LAC","SLI"] },
-  { name: "TERRE RARE", tickers: ["MP","USAR","AREC","CRML"] },
-  { name: "URANIUM", tickers: ["UEC","UUUU","URG","LEU"] },
-  { name: "URANIUM ÉMERGENT", tickers: ["DNN","NXE","EU","UROY"] },
-  { name: "URANIUM AVANCÉ+ÉMERGENT", tickers: ["UEC","UUUU","URG","LEU","DNN","NXE","EU","UROY"] },
-  { name: "RÉACTEUR NUCLÉAIRE", tickers: ["SMR","OKLO","NNE","LTBR"] },
-  { name: "RÉACTEUR NUCLÉAIRE LARGE", tickers: ["BWXT","LEU","SMR","OKLO","NNE","LTBR"] },
-  { name: "RÉACTEUR PUR JOUEUR", tickers: ["SMR","OKLO","NNE"] },
-  { name: "LASER MILITAIRE", tickers: ["LASR"] },
-  { name: "LASER INDUSTRIE", tickers: ["IPGP","LASE"] },
-  { name: "COMPOSANT LASER PHOTONIQUE", tickers: ["LITE","COHR","IPGP","AAOI","LASR"] },
-  { name: "SEMI-CONDUCTEUR PHOTONIQUE", tickers: ["CIEN","FN","VIAV"] },
-  { name: "PUCE DÉPÔT COUCHE MINCE GRAVURE", tickers: ["AMAT","LRCX","ACMR"] },
-  { name: "PUCE MÉTROLOGIE INSPECTION", tickers: ["KLAC","ONTO","NVMI"] }
-];
-
-const MACRO_TICKERS = ["SPY","QQQ","GLD"];
-const JOURNAL = [];
-let API_KEY = localStorage.getItem('polygonKey') || '';
-let tickerData = {};
-let refreshInterval = null;
-let countdownInterval = null;
-let refreshSeconds = 60;
-let openSectors = new Set();
-
-// ==================== INIT ====================
-window.onload = () => {
-  buildSectorCards();
-  updateMarketStatus();
-
-  if (API_KEY) {
-    document.getElementById('apiKeyInput').value = API_KEY;
-    document.getElementById('apiSetup').style.display = 'none';
-    fetchAllData();
-    startRefreshTimer();
-  }
-};
-
-function connectAPI() {
-  const key = document.getElementById('apiKeyInput').value.trim();
-  if (!key) { alert('Entre ta clé API !'); return; }
-  API_KEY = key;
-  localStorage.setItem('polygonKey', key);
-  document.getElementById('apiSetup').style.display = 'none';
-  fetchAllData();
-  startRefreshTimer();
-}
-
-// ==================== MARKET STATUS ====================
-function updateMarketStatus() {
-  const now = new Date();
-  const nyTime = new Date(now.toLocaleString("en-US", {timeZone: "America/New_York"}));
-  const h = nyTime.getHours(), m = nyTime.getMinutes(), d = nyTime.getDay();
-  const isWeekday = d >= 1 && d <= 5;
-  const afterOpen = h > 9 || (h === 9 && m >= 30);
-  const beforeClose = h < 16;
-  const isOpen = isWeekday && afterOpen && beforeClose;
-  const el = document.getElementById('marketStatus');
-  el.textContent = isOpen ? 'MARCHÉ OUVERT' : 'MARCHÉ FERMÉ';
-  el.className = 'market-status ' + (isOpen ? 'open' : 'closed');
-}
-
-// ==================== BUILD CARDS ====================
-function buildSectorCards() {
-  const wrap = document.getElementById('sectorsWrap');
-  wrap.innerHTML = '';
-  SECTORS.forEach((s, i) => {
-    const card = document.createElement('div');
-    card.className = 'sector-card';
-    card.id = `card-${i}`;
-    card.innerHTML = `
-      <div class="sector-header" onclick="toggleSector(${i})">
-        <div class="sector-left">
-          <div class="sector-name">${s.name}</div>
-          <div class="sector-meta" id="meta-${i}">${s.tickers.length} tickers · En attente...</div>
-        </div>
-        <div class="sector-right">
-          <div class="signal-badges" id="badges-${i}">
-            <div class="badge badge-muted">--</div>
-          </div>
-          <div class="score-circle score-0" id="score-${i}">
-            <div class="score-val">--</div>
-            <div class="score-label">SCORE</div>
-          </div>
-        </div>
-      </div>
-      <div class="sector-body" id="body-${i}">
-        <div class="ticker-grid" id="tickers-${i}"></div>
-        <div class="vol-section">
-          <div class="vol-header">
-            <span>VOLUME TOTAL SECTEUR</span>
-            <span id="vol-pct-${i}">--</span>
-          </div>
-          <div class="vol-bar"><div class="vol-fill under" id="vol-bar-${i}" style="width:0%"></div></div>
-        </div>
-      </div>
-    `;
-    wrap.appendChild(card);
-  });
-}
-
-function toggleSector(i) {
-  const body = document.getElementById(`body-${i}`);
-  if (openSectors.has(i)) {
-    openSectors.delete(i);
-    body.classList.remove('open');
-  } else {
-    openSectors.add(i);
-    body.classList.add('open');
-  }
-}
-
-function toggleJournal() {
-  document.getElementById('journalBody').classList.toggle('open');
-}
-
-// ==================== FETCH DATA ====================
-async function fetchAllData() {
-  if (!API_KEY) return;
-  showLoading(true, 'Chargement des données...');
-
-  // Get all unique tickers
-  const allTickers = new Set();
-  SECTORS.forEach(s => s.tickers.forEach(t => allTickers.add(t)));
-  MACRO_TICKERS.forEach(t => allTickers.add(t));
-
-  const tickerList = [...allTickers];
-
-  try {
-    // Fetch snapshot for all tickers
-    const chunks = chunkArray(tickerList, 20);
-    for (const chunk of chunks) {
-      await fetchSnapshot(chunk);
-    }
-    updateAllSectors();
-    updateMacro();
-    updateStats();
-  } catch(e) {
-    console.error(e);
-  }
-
-  showLoading(false);
-}
-
-async function fetchSnapshot(tickers) {
-  const symbols = tickers.join(',');
-  const url = `https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?tickers=${symbols}&apiKey=${API_KEY}`;
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-    if (data.tickers) {
-      data.tickers.forEach(t => {
-        tickerData[t.ticker] = {
-          price: t.day?.c || t.lastTrade?.p || 0,
-          open: t.day?.o || 0,
-          prevClose: t.prevDay?.c || 0,
-          pct: t.todaysChangePerc || 0,
-          vol: t.day?.v || 0,
-          prevVol: t.prevDay?.v || 0,
-        };
-      });
-    }
-  } catch(e) {
-    console.error('Fetch error:', e);
-  }
-}
-
-// ==================== UPDATE SECTORS ====================
-function updateAllSectors() {
-  let ultimateCount = 0, partialCount = 0, volumeCount = 0;
-  let latestSignal = null;
-
-  SECTORS.forEach((s, i) => {
-    const result = computeSector(s, i);
-    if (result.score === 100) { ultimateCount++; if (!latestSignal) latestSignal = {name: s.name, score: 100, sub: result.sub}; }
-    else if (result.score >= 70) partialCount++;
-    else if (result.score >= 40) volumeCount++;
-  });
-
-  document.getElementById('st-ultimate').textContent = ultimateCount;
-  document.getElementById('st-partial').textContent = partialCount;
-  document.getElementById('st-volume').textContent = volumeCount;
-
-  // Alert banner
-  if (latestSignal) {
-    document.getElementById('alertBanner').classList.add('visible');
-    document.getElementById('alertTitle').textContent = `🚨 SIGNAL ULTIME — ${latestSignal.name}`;
-    document.getElementById('alertSub').textContent = latestSignal.sub;
-    document.getElementById('alertTime').textContent = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
-    playAlert();
-    logSignal(latestSignal.name, latestSignal.score, latestSignal.sub);
-  } else {
-    document.getElementById('alertBanner').classList.remove('visible');
-  }
-}
-
-function computeSector(s, i) {
-  const tickers = s.tickers;
-  let allGreen = true;
-  let allVolOver = true;
-  let greenCount = 0;
-  let volOverCount = 0;
-  let totalVol = 0, totalPrevVol = 0;
-  let subParts = [];
-
-  tickers.forEach(sym => {
-    const d = tickerData[sym];
-    if (!d) { allGreen = false; allVolOver = false; return; }
-    if (d.pct > 0) greenCount++;
-    else allGreen = false;
-    if (d.vol > d.prevVol && d.prevVol > 0) volOverCount++;
-    else allVolOver = false;
-    totalVol += d.vol;
-    totalPrevVol += d.prevVol;
-  });
-
-  const totalVolOver = totalPrevVol > 0 && totalVol > totalPrevVol;
-  const volPct = totalPrevVol > 0 ? ((totalVol / totalPrevVol - 1) * 100) : 0;
-
-  // Score calculation
-  let score = 0;
-  // 40pts: all tickers green
-  score += Math.round((greenCount / tickers.length) * 40);
-  // 40pts: each ticker volume > prev
-  score += Math.round((volOverCount / tickers.length) * 40);
-  // 20pts: total sector volume > prev
-  if (totalVolOver) score += 20;
-
-  // Ultimate = 100
-  const isUltimate = score === 100;
-  const isPartial = score >= 70 && score < 100;
-  const isVolume = score >= 40 && score < 70;
-
-  // Update card class
-  const card = document.getElementById(`card-${i}`);
-  card.className = 'sector-card' + (isUltimate ? ' signal-ultimate' : isPartial ? ' signal-partial' : isVolume ? ' signal-volume' : '');
-
-  // Score circle
-  const scoreEl = document.getElementById(`score-${i}`);
-  const scoreClass = score === 0 ? 'score-0' : score < 40 ? 'score-low' : score < 70 ? 'score-mid' : score < 100 ? 'score-high' : 'score-max';
-  scoreEl.className = `score-circle ${scoreClass}`;
-  scoreEl.innerHTML = `<div class="score-val">${score === 0 && Object.keys(tickerData).length === 0 ? '--' : score}</div><div class="score-label">SCORE</div>`;
-
-  // Badges
-  const badgesEl = document.getElementById(`badges-${i}`);
-  let badgesHTML = '';
-  if (isUltimate) badgesHTML = '<div class="badge badge-green">🚨 ULTIME</div>';
-  else {
-    if (allGreen) badgesHTML += '<div class="badge badge-green">✅ TOUT VERT</div>';
-    else badgesHTML += `<div class="badge badge-muted">${greenCount}/${tickers.length} VERT</div>`;
-    if (totalVolOver) badgesHTML += `<div class="badge badge-blue">VOL +${volPct.toFixed(0)}%</div>`;
-  }
-  if (!badgesHTML) badgesHTML = '<div class="badge badge-muted">En attente</div>';
-  badgesEl.innerHTML = badgesHTML;
-
-  // Meta
-  document.getElementById(`meta-${i}`).textContent = `${tickers.length} tickers · Score ${score}/100`;
-
-  // Ticker grid
-  const tickerGrid = document.getElementById(`tickers-${i}`);
-  tickerGrid.innerHTML = '';
-  tickers.forEach(sym => {
-    const d = tickerData[sym];
-    if (!d) {
-      tickerGrid.innerHTML += `<div class="ticker-item"><div class="ticker-sym">${sym}</div><div class="ticker-pct flat">--</div><div class="ticker-vol">--</div></div>`;
-      return;
-    }
-    const isUlt = d.pct > 0 && d.vol > d.prevVol;
-    const volRatio = d.prevVol > 0 ? ((d.vol / d.prevVol - 1) * 100) : 0;
-    tickerGrid.innerHTML += `
-      <div class="ticker-item ${isUlt ? 'ultimate' : ''}">
-        <div class="ticker-sym">${sym}</div>
-        <div class="ticker-pct ${d.pct > 0 ? 'up' : d.pct < 0 ? 'down' : 'flat'}">${d.pct > 0 ? '+' : ''}${d.pct.toFixed(2)}%</div>
-        <div class="ticker-vol ${d.vol > d.prevVol ? 'over' : 'under'}">VOL ${d.vol > d.prevVol ? '↑' : '↓'} ${volRatio > 0 ? '+' : ''}${volRatio.toFixed(0)}%</div>
-      </div>`;
-  });
-
-  // Volume bar
-  const barWidth = Math.min(totalPrevVol > 0 ? (totalVol / totalPrevVol) * 60 : 0, 100);
-  const barEl = document.getElementById(`vol-bar-${i}`);
-  barEl.style.width = barWidth + '%';
-  barEl.className = `vol-fill ${totalVolOver ? 'over' : barWidth > 40 ? 'partial' : 'under'}`;
-  document.getElementById(`vol-pct-${i}`).textContent = totalPrevVol > 0 ? `${volPct > 0 ? '+' : ''}${volPct.toFixed(0)}% vs veille` : '--';
-  document.getElementById(`vol-pct-${i}`).style.color = totalVolOver ? 'var(--green)' : volPct > 0 ? 'var(--yellow)' : 'var(--muted)';
-
-  return { score, sub: `${greenCount}/${tickers.length} vert · Vol ${volPct > 0 ? '+' : ''}${volPct.toFixed(0)}%` };
-}
-
-// ==================== MACRO ====================
-function updateMacro() {
-  const macroMap = { SPY: ['m-spy','mc-spy'], QQQ: ['m-qqq','mc-qqq'], GLD: ['m-gld','mc-gld'] };
-  Object.entries(macroMap).forEach(([sym, [priceId, chgId]]) => {
-    const d = tickerData[sym];
-    if (!d) return;
-    document.getElementById(priceId).textContent = d.price > 0 ? d.price.toFixed(2) : '--';
-    const chgEl = document.getElementById(chgId);
-    chgEl.textContent = `${d.pct > 0 ? '+' : ''}${d.pct.toFixed(2)}%`;
-    chgEl.className = `macro-chg ${d.pct > 0 ? 'up' : 'down'}`;
-  });
-}
-
-function updateStats() {
-  document.getElementById('st-total').textContent = SECTORS.length;
-}
-
-// ==================== JOURNAL ====================
-function logSignal(sector, score, sub) {
-  const now = new Date();
-  const entry = {
-    time: now.toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit',second:'2-digit'}),
-    date: now.toLocaleDateString('fr-FR'),
-    sector, score, sub
-  };
-
-  // Avoid duplicate within 5 min
-  const last = JOURNAL[JOURNAL.length - 1];
-  if (last && last.sector === sector && (now - new Date()) < 300000) return;
-
-  JOURNAL.push(entry);
-  renderJournal();
-}
-
-function renderJournal() {
-  const body = document.getElementById('journalBody');
-  const empty = document.getElementById('emptyJournal');
-  document.getElementById('journalCount').textContent = `${JOURNAL.length} signal${JOURNAL.length > 1 ? 's' : ''}`;
-
-  if (JOURNAL.length === 0) {
-    empty.style.display = 'block';
-    return;
-  }
-  empty.style.display = 'none';
-
-  const entries = [...JOURNAL].reverse().slice(0, 20);
-  body.innerHTML = entries.map(e => `
-    <div class="journal-entry">
-      <span class="je-time">${e.date} ${e.time}</span>
-      <span class="je-sector">${e.sector}</span>
-      <span class="je-score">${e.score}/100</span>
-      <span style="color:var(--muted)">${e.sub}</span>
+  <!-- DRONE — SIGNAL COMPLET -->
+  <div class="sector-card signal">
+    <div class="signal-badge">🚀</div>
+    <div class="sector-name">Drone</div>
+    <div class="sector-status">
+      <div class="status-pill green-all">100% VERT</div>
     </div>
-  `).join('') + '<div id="emptyJournal" style="display:none"></div>';
-}
+    <div class="volume-bar-wrap">
+      <div class="volume-label">
+        <span>VOL SECTEUR</span>
+        <span style="color: var(--green)">+147%</span>
+      </div>
+      <div class="volume-bar">
+        <div class="volume-fill over" style="width:100%"></div>
+      </div>
+    </div>
+    <div class="sector-tickers">
+      <div class="ticker-chip up">RCAT +32%</div>
+      <div class="ticker-chip up">UMAC +50%</div>
+      <div class="ticker-chip up">AVAV +18%</div>
+      <div class="ticker-chip up">KTOS +13%</div>
+      <div class="ticker-chip up">ONDS +9%</div>
+    </div>
+  </div>
 
-// ==================== REFRESH TIMER ====================
-function startRefreshTimer() {
-  if (refreshInterval) clearInterval(refreshInterval);
-  if (countdownInterval) clearInterval(countdownInterval);
+  <!-- QUANTIQUE — EN APPROCHE -->
+  <div class="sector-card partial">
+    <div class="sector-name">Quantique</div>
+    <div class="sector-status">
+      <div class="status-pill partial">5/6 VERT</div>
+    </div>
+    <div class="volume-bar-wrap">
+      <div class="volume-label">
+        <span>VOL SECTEUR</span>
+        <span style="color: var(--yellow)">+82%</span>
+      </div>
+      <div class="volume-bar">
+        <div class="volume-fill over" style="width:82%; background: var(--yellow)"></div>
+      </div>
+    </div>
+    <div class="sector-tickers">
+      <div class="ticker-chip up">RGTI +8%</div>
+      <div class="ticker-chip up">QBTS +6%</div>
+      <div class="ticker-chip up">IONQ +5%</div>
+      <div class="ticker-chip up">QUBT +4%</div>
+      <div class="ticker-chip down">ARQQ -1%</div>
+    </div>
+  </div>
 
-  refreshSeconds = 60;
-  updateCountdown();
+  <!-- CANNABIS — EN APPROCHE -->
+  <div class="sector-card partial">
+    <div class="sector-name">Cannabis</div>
+    <div class="sector-status">
+      <div class="status-pill partial">4/6 VERT</div>
+    </div>
+    <div class="volume-bar-wrap">
+      <div class="volume-label">
+        <span>VOL SECTEUR</span>
+        <span style="color: var(--yellow)">+61%</span>
+      </div>
+      <div class="volume-bar">
+        <div class="volume-fill over" style="width:61%; background: var(--yellow)"></div>
+      </div>
+    </div>
+    <div class="sector-tickers">
+      <div class="ticker-chip up">SNDL +5%</div>
+      <div class="ticker-chip up">CGC +4%</div>
+      <div class="ticker-chip up">TLRY +3%</div>
+      <div class="ticker-chip down">ACB -2%</div>
+    </div>
+  </div>
 
-  countdownInterval = setInterval(() => {
-    refreshSeconds--;
-    updateCountdown();
-    if (refreshSeconds <= 0) {
-      refreshSeconds = 60;
-      fetchAllData();
-    }
-  }, 1000);
-}
+  <!-- NUCLEAIRE — NEUTRE -->
+  <div class="sector-card">
+    <div class="sector-name">Nucléaire</div>
+    <div class="sector-status">
+      <div class="status-pill red">3/6 VERT</div>
+    </div>
+    <div class="volume-bar-wrap">
+      <div class="volume-label">
+        <span>VOL SECTEUR</span>
+        <span style="color: var(--muted)">-12%</span>
+      </div>
+      <div class="volume-bar">
+        <div class="volume-fill under" style="width:40%"></div>
+      </div>
+    </div>
+    <div class="sector-tickers">
+      <div class="ticker-chip up">CCJ +2%</div>
+      <div class="ticker-chip down">NNE -1%</div>
+      <div class="ticker-chip down">SMR -3%</div>
+      <div class="ticker-chip up">UEC +1%</div>
+    </div>
+  </div>
 
-function updateCountdown() {
-  document.getElementById('refreshTimer').textContent = refreshSeconds + 's';
-  const pct = (refreshSeconds / 60) * 100;
-  document.getElementById('refreshFill').style.width = pct + '%';
-}
+</div>
 
-// ==================== UTILS ====================
-function chunkArray(arr, size) {
-  const chunks = [];
-  for (let i = 0; i < arr.length; i += size) chunks.push(arr.slice(i, i + size));
-  return chunks;
-}
+<!-- BARRE REFRESH -->
+<div class="refresh-bar">
+  <div class="refresh-label">REFRESH</div>
+  <div class="refresh-track">
+    <div class="refresh-progress"></div>
+  </div>
+  <div class="refresh-timer">60s</div>
+</div>
 
-function showLoading(show, text = '') {
-  const el = document.getElementById('loadingOverlay');
-  el.style.display = show ? 'flex' : 'none';
-  if (text) document.getElementById('loadingText').textContent = text;
-}
-
-function playAlert() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    [880, 1100, 1320].forEach((freq, i) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.frequency.value = freq;
-      osc.type = 'sine';
-      gain.gain.setValueAtTime(0.3, ctx.currentTime + i * 0.15);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.15 + 0.3);
-      osc.start(ctx.currentTime + i * 0.15);
-      osc.stop(ctx.currentTime + i * 0.15 + 0.3);
-    });
-  } catch(e) {}
-}
-
-// Update market status every minute
-setInterval(updateMarketStatus, 60000);
-</script>
 </body>
-</html> 
+</html>
