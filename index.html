@@ -826,7 +826,12 @@ async function fetchSnapshot(tickers) {
   const symbols = tickers.join(',');
   const url = `https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?tickers=${symbols}&apiKey=${API_KEY}`;
   try {
-    const res = await fetch(url);
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${API_KEY}`
+      }
+    });
     const data = await res.json();
     if (data.tickers) {
       data.tickers.forEach(t => {
@@ -1081,4 +1086,3 @@ setInterval(updateMarketStatus, 60000);
 </script>
 </body>
 </html>
- 
