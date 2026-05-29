@@ -824,7 +824,7 @@ async function fetchAllData() {
  
 async function fetchSnapshot(tickers) {
   const symbols = tickers.join(',');
-  const url = `https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?tickers=${symbols}&apiKey=${API_KEY}`;
+  const url = `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?tickers=${symbols}&apiKey=${API_KEY}`)}`;
   try {
     const res = await fetch(url);
     const data = await res.json();
