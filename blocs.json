@@ -1,0 +1,2036 @@
+{
+  "blocs": [
+    {
+      "id": 1,
+      "nom": "Nucléaire SMR de rupture",
+      "pertinence": "A",
+      "N1": [
+        "SMR",
+        "OKLO",
+        "NNE",
+        "LTBR"
+      ],
+      "N2": [
+        "LEU",
+        "BWXT"
+      ],
+      "N3": []
+    },
+    {
+      "id": 2,
+      "nom": "Informatique quantique",
+      "pertinence": "A",
+      "N1": [
+        "IONQ",
+        "RGTI",
+        "QBTS",
+        "ARQQ",
+        "QUBT"
+      ],
+      "N2": [],
+      "N3": [
+        "IBM",
+        "GOOGL",
+        "HON"
+      ]
+    },
+    {
+      "id": 3,
+      "nom": "Drones militaires & guerre IA",
+      "pertinence": "A",
+      "N1": [
+        "AVAV",
+        "KTOS",
+        "RCAT",
+        "UMAC",
+        "ONDS"
+      ],
+      "N2": [
+        "AVAV"
+      ],
+      "N3": [
+        "PLTR",
+        "LMT"
+      ]
+    },
+    {
+      "id": 4,
+      "nom": "Spatial & lanceurs orbitaux",
+      "pertinence": "A",
+      "N1": [
+        "RKLB",
+        "LUNR",
+        "PL",
+        "BKSY",
+        "RDW",
+        "KRMN",
+        "SPIR"
+      ],
+      "N2": [],
+      "N3": [
+        "VOYG"
+      ]
+    },
+    {
+      "id": 5,
+      "nom": "Communications satellites & réseaux",
+      "pertinence": "A",
+      "N1": [
+        "ASTS",
+        "GSAT",
+        "SATL",
+        "SIDU"
+      ],
+      "N2": [
+        "IRDM"
+      ],
+      "N3": []
+    },
+    {
+      "id": 6,
+      "nom": "Édition génomique (CRISPR)",
+      "pertinence": "A",
+      "N1": [
+        "CRSP",
+        "NTLA",
+        "EDIT",
+        "BEAM"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 7,
+      "nom": "Robotique industrialisée",
+      "pertinence": "A",
+      "N1": [
+        "SYM",
+        "PATH",
+        "RR"
+      ],
+      "N2": [],
+      "N3": [
+        "ABBNY",
+        "FANUY"
+      ]
+    },
+    {
+      "id": 8,
+      "nom": "Mines terres rares",
+      "pertinence": "A",
+      "N1": [
+        "MP",
+        "LYSDY",
+        "AREC",
+        "USAS"
+      ],
+      "N2": [
+        "UUUU"
+      ],
+      "N3": []
+    },
+    {
+      "id": 9,
+      "nom": "Photonique IA (interne serveurs)",
+      "pertinence": "A",
+      "N1": [
+        "LITE",
+        "COHR",
+        "POET",
+        "AEHR"
+      ],
+      "N2": [
+        "MTSI",
+        "IPGP",
+        "AXTI"
+      ],
+      "N3": []
+    },
+    {
+      "id": 10,
+      "nom": "Vision 3D & Lidar automatisation",
+      "pertinence": "A",
+      "N1": [
+        "HSAI",
+        "OUST",
+        "INVZ",
+        "AEVA",
+        "LAZR"
+      ],
+      "N2": [],
+      "N3": [
+        "CEVA"
+      ]
+    },
+    {
+      "id": 11,
+      "nom": "Refroidissement liquide serveurs",
+      "pertinence": "A",
+      "N1": [
+        "VRT"
+      ],
+      "N2": [
+        "SMCI",
+        "MOD",
+        "AAON"
+      ],
+      "N3": [
+        "BE"
+      ]
+    },
+    {
+      "id": 12,
+      "nom": "Hydrogène & piles à combustible",
+      "pertinence": "A",
+      "N1": [
+        "PLUG",
+        "FCEL",
+        "BLDP",
+        "BE",
+        "HYSR"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 13,
+      "nom": "Médecine neurologique de rupture",
+      "pertinence": "A",
+      "N1": [
+        "CMPS",
+        "ATAI",
+        "CYBN"
+      ],
+      "N2": [],
+      "N3": [
+        "GH"
+      ]
+    },
+    {
+      "id": 14,
+      "nom": "Aimants permanents & mine-to-magnet",
+      "pertinence": "A",
+      "N1": [
+        "USAR",
+        "CRML"
+      ],
+      "N2": [
+        "MP"
+      ],
+      "N3": []
+    },
+    {
+      "id": 15,
+      "nom": "Humanoïdes & fabricants",
+      "pertinence": "A",
+      "N1": [
+        "SERV",
+        "PDYN",
+        "RR"
+      ],
+      "N2": [
+        "TSLA"
+      ],
+      "N3": [
+        "NVDA"
+      ]
+    },
+    {
+      "id": 16,
+      "nom": "Composants robots (vision, lidar, actionneurs)",
+      "pertinence": "A",
+      "N1": [
+        "AMBA",
+        "HSAI",
+        "OUST"
+      ],
+      "N2": [
+        "CEVA",
+        "ALAB"
+      ],
+      "N3": []
+    },
+    {
+      "id": 17,
+      "nom": "Tokenisation & infrastructure RWA",
+      "pertinence": "A",
+      "N1": [
+        "COIN",
+        "CRCL",
+        "GLXY"
+      ],
+      "N2": [
+        "HOOD"
+      ],
+      "N3": [
+        "BLK"
+      ]
+    },
+    {
+      "id": 18,
+      "nom": "Tourisme spatial",
+      "pertinence": "A",
+      "N1": [
+        "SPCE"
+      ],
+      "N2": [],
+      "N3": [
+        "RKLB",
+        "ASTR"
+      ]
+    },
+    {
+      "id": 19,
+      "nom": "Antimoine & métaux critiques",
+      "pertinence": "A",
+      "N1": [
+        "PPTA",
+        "USAR",
+        "CRML"
+      ],
+      "N2": [
+        "MP"
+      ],
+      "N3": []
+    },
+    {
+      "id": 20,
+      "nom": "Longévité & anti-âge",
+      "pertinence": "A",
+      "N1": [
+        "RXRX",
+        "ABCL"
+      ],
+      "N2": [],
+      "N3": [
+        "TMO",
+        "DNA",
+        "UNITY"
+      ]
+    },
+    {
+      "id": 21,
+      "nom": "IA en découverte de médicaments",
+      "pertinence": "A",
+      "N1": [
+        "RXRX",
+        "SDGR",
+        "ABSI"
+      ],
+      "N2": [
+        "ABCL"
+      ],
+      "N3": [
+        "CRMD"
+      ]
+    },
+    {
+      "id": 22,
+      "nom": "Radiopharmaceutiques (oncologie)",
+      "pertinence": "A",
+      "N1": [
+        "LNTH",
+        "TLX",
+        "ACTU"
+      ],
+      "N2": [],
+      "N3": [
+        "RYTM"
+      ]
+    },
+    {
+      "id": 23,
+      "nom": "Crypto & minage blockchain",
+      "pertinence": "A",
+      "N1": [
+        "MARA",
+        "RIOT",
+        "CLSK",
+        "WULF",
+        "IREN",
+        "BITF",
+        "HUT",
+        "BTDR",
+        "CIFR"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 24,
+      "nom": "Trésorerie crypto & proxies BTC",
+      "pertinence": "A",
+      "N1": [
+        "MSTR"
+      ],
+      "N2": [
+        "COIN"
+      ],
+      "N3": [
+        "HOOD"
+      ]
+    },
+    {
+      "id": 25,
+      "nom": "Véhicules électriques & rupture",
+      "pertinence": "A",
+      "N1": [
+        "RIVN",
+        "LCID"
+      ],
+      "N2": [
+        "TSLA"
+      ],
+      "N3": []
+    },
+    {
+      "id": 26,
+      "nom": "Immunothérapie & oncologie ciblée",
+      "pertinence": "A",
+      "N1": [
+        "IOVA",
+        "HALO"
+      ],
+      "N2": [
+        "BNTX",
+        "MRNA"
+      ],
+      "N3": []
+    },
+    {
+      "id": 27,
+      "nom": "Taxis volants / eVTOL",
+      "pertinence": "A",
+      "N1": [
+        "JOBY",
+        "ACHR",
+        "EVTL",
+        "EH",
+        "HOVR"
+      ],
+      "N2": [],
+      "N3": [
+        "ONDS"
+      ]
+    },
+    {
+      "id": 28,
+      "nom": "Conduite autonome & vision",
+      "pertinence": "A",
+      "N1": [
+        "AUR",
+        "PONY",
+        "WRD",
+        "MBLY"
+      ],
+      "N2": [
+        "TSLA"
+      ],
+      "N3": [
+        "GT"
+      ]
+    },
+    {
+      "id": 29,
+      "nom": "Chirurgie robotisée",
+      "pertinence": "A",
+      "N1": [
+        "ISRG",
+        "PRCT",
+        "SILK"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 30,
+      "nom": "GLP-1 / obésité & métabolisme",
+      "pertinence": "A",
+      "N1": [
+        "VKTX",
+        "ALT",
+        "TERN",
+        "STOK"
+      ],
+      "N2": [
+        "LLY",
+        "NVO"
+      ],
+      "N3": []
+    },
+    {
+      "id": 31,
+      "nom": "Diagnostic IA & imagerie",
+      "pertinence": "A",
+      "N1": [
+        "TEM",
+        "GH",
+        "NTRA"
+      ],
+      "N2": [
+        "EXAS"
+      ],
+      "N3": [
+        "CDNA"
+      ]
+    },
+    {
+      "id": 32,
+      "nom": "Électrification & réseau (data centers)",
+      "pertinence": "A",
+      "N1": [
+        "GEV",
+        "POWL"
+      ],
+      "N2": [
+        "ETN",
+        "PWR",
+        "NVT",
+        "HUBB"
+      ],
+      "N3": []
+    },
+    {
+      "id": 33,
+      "nom": "Stockage batteries / grid storage",
+      "pertinence": "A",
+      "N1": [
+        "FLNC",
+        "STEM",
+        "EOSE",
+        "AMPX",
+        "NRGV"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 34,
+      "nom": "Impression 3D / fabrication additive",
+      "pertinence": "A",
+      "N1": [
+        "DDD",
+        "SSYS",
+        "MKFG",
+        "VLD",
+        "NNDM"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 35,
+      "nom": "Uranium (minage pur)",
+      "pertinence": "A",
+      "N1": [
+        "CCJ",
+        "DNN",
+        "UEC",
+        "NXE",
+        "URG",
+        "UUUU"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 36,
+      "nom": "Fintech / néobanques",
+      "pertinence": "A",
+      "N1": [
+        "SOFI",
+        "NU",
+        "DAVE"
+      ],
+      "N2": [
+        "AFRM",
+        "UPST"
+      ],
+      "N3": []
+    },
+    {
+      "id": 37,
+      "nom": "Logiciels IA / agents",
+      "pertinence": "A",
+      "N1": [
+        "AI",
+        "BBAI",
+        "SOUN",
+        "INOD"
+      ],
+      "N2": [
+        "PLTR",
+        "NOW"
+      ],
+      "N3": []
+    },
+    {
+      "id": 38,
+      "nom": "Semi-conducteurs IA (calcul)",
+      "pertinence": "A",
+      "N1": [
+        "ALAB",
+        "ARM"
+      ],
+      "N2": [
+        "NVDA",
+        "AMD",
+        "MRVL",
+        "AVGO"
+      ],
+      "N3": []
+    },
+    {
+      "id": 39,
+      "nom": "Stablecoins & paiements crypto",
+      "pertinence": "A",
+      "N1": [
+        "CRCL",
+        "BULL"
+      ],
+      "N2": [
+        "COIN",
+        "XYZ"
+      ],
+      "N3": [
+        "HOOD"
+      ]
+    },
+    {
+      "id": 40,
+      "nom": "Trésoreries ETH & altcoins",
+      "pertinence": "A",
+      "N1": [
+        "BMNR",
+        "SBET",
+        "BTBT",
+        "DFDV"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 41,
+      "nom": "Mines lithium & gisements",
+      "pertinence": "B",
+      "N1": [
+        "ALB",
+        "SQM",
+        "ALTM",
+        "LAC",
+        "SGML",
+        "SLI"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 42,
+      "nom": "Infra optique (autoroutes web)",
+      "pertinence": "B",
+      "N1": [
+        "FN",
+        "CIEN",
+        "LUNA",
+        "VIAV"
+      ],
+      "N2": [
+        "DZSI"
+      ],
+      "N3": []
+    },
+    {
+      "id": 43,
+      "nom": "Optique militaire & capteurs",
+      "pertinence": "B",
+      "N1": [
+        "MVIS",
+        "KVHI"
+      ],
+      "N2": [
+        "COHR",
+        "MKSI",
+        "PLXS"
+      ],
+      "N3": []
+    },
+    {
+      "id": 44,
+      "nom": "Machines fabrication puces",
+      "pertinence": "B",
+      "N1": [
+        "AMAT",
+        "LRCX",
+        "KLAC",
+        "ASML",
+        "ONTO",
+        "ACMR",
+        "NVMI",
+        "TER"
+      ],
+      "N2": [
+        "AEIS"
+      ],
+      "N3": []
+    },
+    {
+      "id": 45,
+      "nom": "Immobilier data centers",
+      "pertinence": "B",
+      "N1": [
+        "EQIX",
+        "DLR"
+      ],
+      "N2": [],
+      "N3": [
+        "AMT",
+        "CCI",
+        "IRM"
+      ]
+    },
+    {
+      "id": 46,
+      "nom": "Câblage & commutation réseaux IA",
+      "pertinence": "B",
+      "N1": [
+        "ANET",
+        "CRDO"
+      ],
+      "N2": [
+        "AVGO",
+        "MRVL",
+        "CSCO",
+        "JNPR"
+      ],
+      "N3": [
+        "DIOD",
+        "EXTR"
+      ]
+    },
+    {
+      "id": 47,
+      "nom": "Transport maritime / conteneurs",
+      "pertinence": "B",
+      "N1": [
+        "ZIM",
+        "MATX",
+        "GSL",
+        "DAC"
+      ],
+      "N2": [
+        "KEX"
+      ],
+      "N3": []
+    },
+    {
+      "id": 48,
+      "nom": "Primes défense (intégrés)",
+      "pertinence": "B",
+      "N1": [
+        "LMT",
+        "NOC",
+        "GD",
+        "LHX"
+      ],
+      "N2": [
+        "RTX"
+      ],
+      "N3": []
+    },
+    {
+      "id": 49,
+      "nom": "Munitions & systèmes terrestres",
+      "pertinence": "B",
+      "N1": [
+        "AXON",
+        "OLN"
+      ],
+      "N2": [
+        "GD",
+        "LDOS",
+        "HII",
+        "BA"
+      ],
+      "N3": []
+    },
+    {
+      "id": 50,
+      "nom": "Engrais & nutrition des cultures",
+      "pertinence": "B",
+      "N1": [
+        "NTR",
+        "CF",
+        "MOS",
+        "IPI"
+      ],
+      "N2": [
+        "SQM"
+      ],
+      "N3": []
+    },
+    {
+      "id": 51,
+      "nom": "Identité & zero trust",
+      "pertinence": "B",
+      "N1": [
+        "ZS",
+        "OKTA",
+        "CYBR",
+        "TENB"
+      ],
+      "N2": [
+        "RBRK"
+      ],
+      "N3": []
+    },
+    {
+      "id": 52,
+      "nom": "Royalties & streaming or/argent",
+      "pertinence": "B",
+      "N1": [
+        "FNV",
+        "WPM",
+        "RGLD",
+        "OR",
+        "SAND"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 53,
+      "nom": "Recyclage batteries & circularité",
+      "pertinence": "B",
+      "N1": [
+        "LICY",
+        "AQMS"
+      ],
+      "N2": [
+        "NRGV"
+      ],
+      "N3": []
+    },
+    {
+      "id": 54,
+      "nom": "CRM & cloud entreprise",
+      "pertinence": "B",
+      "N1": [
+        "CRM",
+        "HUBS",
+        "MNDY",
+        "ASAN"
+      ],
+      "N2": [
+        "NOW"
+      ],
+      "N3": []
+    },
+    {
+      "id": 55,
+      "nom": "Bases de données & data cloud",
+      "pertinence": "B",
+      "N1": [
+        "SNOW",
+        "MDB",
+        "CFLT",
+        "ESTC"
+      ],
+      "N2": [
+        "DDOG"
+      ],
+      "N3": []
+    },
+    {
+      "id": 56,
+      "nom": "Cybersécurité (plateforme)",
+      "pertinence": "B",
+      "N1": [
+        "PANW",
+        "CRWD",
+        "FTNT",
+        "ZS",
+        "S"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 57,
+      "nom": "Devops & observabilité",
+      "pertinence": "B",
+      "N1": [
+        "DDOG",
+        "NET",
+        "GTLB",
+        "FROG",
+        "DT"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 58,
+      "nom": "Fintech-software & paiements",
+      "pertinence": "B",
+      "N1": [
+        "XYZ",
+        "TOST",
+        "AFRM",
+        "BILL"
+      ],
+      "N2": [
+        "PYPL"
+      ],
+      "N3": []
+    },
+    {
+      "id": 59,
+      "nom": "Serveurs & infrastructure compute",
+      "pertinence": "B",
+      "N1": [
+        "DELL",
+        "SMCI",
+        "HPE"
+      ],
+      "N2": [
+        "VRT",
+        "ANET"
+      ],
+      "N3": []
+    },
+    {
+      "id": 60,
+      "nom": "Mémoire & stockage",
+      "pertinence": "B",
+      "N1": [
+        "MU",
+        "WDC",
+        "STX",
+        "SNDK",
+        "PSTG"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 61,
+      "nom": "Casinos & jeux d'argent",
+      "pertinence": "B",
+      "N1": [
+        "LVS",
+        "DKNG",
+        "WYNN",
+        "MGM",
+        "CZR"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 62,
+      "nom": "Méga-caps internet & IA",
+      "pertinence": "B",
+      "N1": [],
+      "N2": [
+        "GOOGL",
+        "META",
+        "AMZN",
+        "NFLX"
+      ],
+      "N3": []
+    },
+    {
+      "id": 63,
+      "nom": "Aérospatial civil",
+      "pertinence": "B",
+      "N1": [
+        "BA",
+        "HEI",
+        "TDG",
+        "HWM"
+      ],
+      "N2": [
+        "GE"
+      ],
+      "N3": []
+    },
+    {
+      "id": 64,
+      "nom": "Courtage",
+      "pertinence": "B",
+      "N1": [
+        "SCHW",
+        "IBKR",
+        "MKTX"
+      ],
+      "N2": [
+        "HOOD"
+      ],
+      "N3": []
+    },
+    {
+      "id": 65,
+      "nom": "Acier & aluminium",
+      "pertinence": "B",
+      "N1": [
+        "NUE",
+        "STLD",
+        "CLF",
+        "X",
+        "AA"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 66,
+      "nom": "Charbon",
+      "pertinence": "B",
+      "N1": [
+        "BTU",
+        "ARCH",
+        "AMR",
+        "CEIX",
+        "HCC"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 67,
+      "nom": "Dry bulk shipping",
+      "pertinence": "B",
+      "N1": [
+        "GNK",
+        "SBLK",
+        "GOGL",
+        "EGLE"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 68,
+      "nom": "Made in USA & automatisation domestique",
+      "pertinence": "B",
+      "N1": [
+        "ROK"
+      ],
+      "N2": [
+        "EMR",
+        "ETN",
+        "PWR",
+        "FIX",
+        "AME"
+      ],
+      "N3": []
+    },
+    {
+      "id": 69,
+      "nom": "Construction industrielle & ingénierie",
+      "pertinence": "B",
+      "N1": [
+        "ACM",
+        "FLR",
+        "MTZ",
+        "PRIM"
+      ],
+      "N2": [
+        "PWR",
+        "J"
+      ],
+      "N3": []
+    },
+    {
+      "id": 70,
+      "nom": "E&P pétrole (exploration-production)",
+      "pertinence": "B",
+      "N1": [
+        "COP",
+        "EOG",
+        "OXY",
+        "DVN",
+        "FANG",
+        "NOG"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 71,
+      "nom": "Services pétroliers & équipement",
+      "pertinence": "B",
+      "N1": [
+        "SLB",
+        "HAL",
+        "BKR",
+        "FTI",
+        "WFRD",
+        "NOV"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 72,
+      "nom": "Transport maritime / tankers",
+      "pertinence": "B",
+      "N1": [
+        "FRO",
+        "STNG",
+        "INSW",
+        "DHT",
+        "TNK"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 73,
+      "nom": "Producteurs gaz naturel",
+      "pertinence": "B",
+      "N1": [
+        "EQT",
+        "EXE",
+        "AR",
+        "RRC",
+        "CNX",
+        "LNG"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 74,
+      "nom": "Infrastructure & export GNL",
+      "pertinence": "B",
+      "N1": [
+        "LNG",
+        "GLNG",
+        "FLNG"
+      ],
+      "N2": [
+        "WMB",
+        "KMI",
+        "TRGP"
+      ],
+      "N3": []
+    },
+    {
+      "id": 75,
+      "nom": "Solaire & onduleurs",
+      "pertinence": "B",
+      "N1": [
+        "FSLR",
+        "ENPH",
+        "SEDG",
+        "ARRY",
+        "SHLS",
+        "NXT",
+        "CSIQ"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 76,
+      "nom": "Éolien (turbines & développeurs)",
+      "pertinence": "B",
+      "N1": [
+        "VWDRY",
+        "TPIC",
+        "AMSC"
+      ],
+      "N2": [
+        "GEV"
+      ],
+      "N3": []
+    },
+    {
+      "id": 77,
+      "nom": "Géothermie & baseload vert",
+      "pertinence": "B",
+      "N1": [
+        "ORA"
+      ],
+      "N2": [],
+      "N3": [
+        "FLNC",
+        "NRGV"
+      ]
+    },
+    {
+      "id": 78,
+      "nom": "Biocarburants & carburants renouvelables",
+      "pertinence": "B",
+      "N1": [
+        "GEVO",
+        "GPRE",
+        "REX",
+        "CLNE",
+        "AMTX"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 79,
+      "nom": "Captage carbone & efficacité",
+      "pertinence": "B",
+      "N1": [
+        "ERII",
+        "AMRC"
+      ],
+      "N2": [
+        "LIN",
+        "APD"
+      ],
+      "N3": [
+        "CDR"
+      ]
+    },
+    {
+      "id": 80,
+      "nom": "Or & métaux précieux (minage)",
+      "pertinence": "B",
+      "N1": [
+        "NEM",
+        "AEM",
+        "GOLD",
+        "KGC",
+        "HMY"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 81,
+      "nom": "Argent (silver minage)",
+      "pertinence": "B",
+      "N1": [
+        "PAAS",
+        "AG",
+        "HL",
+        "CDE",
+        "EXK"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 82,
+      "nom": "Fonderie & nationalisation puces",
+      "pertinence": "B",
+      "N1": [
+        "TSM",
+        "GFS",
+        "UMC"
+      ],
+      "N2": [
+        "INTC"
+      ],
+      "N3": []
+    },
+    {
+      "id": 83,
+      "nom": "Restauration / fast-casual croissance",
+      "pertinence": "B",
+      "N1": [
+        "CMG",
+        "WING",
+        "CAVA",
+        "SG",
+        "DNUT"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 84,
+      "nom": "Marques émergentes / lifestyle",
+      "pertinence": "B",
+      "N1": [
+        "ELF",
+        "CELH",
+        "BROS",
+        "FIGS",
+        "ONON"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 85,
+      "nom": "Gaming & esports",
+      "pertinence": "B",
+      "N1": [
+        "RBLX",
+        "TTWO",
+        "U",
+        "GRVY"
+      ],
+      "N2": [],
+      "N3": [
+        "SLE"
+      ]
+    },
+    {
+      "id": 86,
+      "nom": "Nucléaire utilities (production)",
+      "pertinence": "B",
+      "N1": [
+        "CEG",
+        "VST",
+        "TLN"
+      ],
+      "N2": [
+        "NRG"
+      ],
+      "N3": []
+    },
+    {
+      "id": 87,
+      "nom": "Cuivre & électrification",
+      "pertinence": "B",
+      "N1": [
+        "FCX",
+        "SCCO",
+        "ERO",
+        "HBM"
+      ],
+      "N2": [
+        "TECK"
+      ],
+      "N3": []
+    },
+    {
+      "id": 88,
+      "nom": "E-commerce / SaaS croissance",
+      "pertinence": "B",
+      "N1": [
+        "SHOP",
+        "DASH",
+        "GLBE",
+        "BIGC",
+        "WIX"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 89,
+      "nom": "Adtech / publicité programmatique",
+      "pertinence": "B",
+      "N1": [
+        "TTD",
+        "APP",
+        "MGNI",
+        "PUBM",
+        "DV"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 90,
+      "nom": "Chemins de fer (rail)",
+      "pertinence": "C",
+      "N1": [
+        "UNP",
+        "CSX",
+        "NSC",
+        "CP",
+        "CNI"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 91,
+      "nom": "Compagnies aériennes",
+      "pertinence": "C",
+      "N1": [
+        "DAL",
+        "UAL",
+        "AAL",
+        "LUV",
+        "ALK"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 92,
+      "nom": "Transport routier / camionnage",
+      "pertinence": "C",
+      "N1": [
+        "ODFL",
+        "KNX",
+        "SAIA",
+        "JBHT",
+        "WERN",
+        "XPO"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 93,
+      "nom": "Fret aérien & colis (logistique)",
+      "pertinence": "C",
+      "N1": [
+        "UPS",
+        "FDX",
+        "CHRW",
+        "GXO",
+        "EXPD"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 94,
+      "nom": "Machines agricoles & agro-négoce",
+      "pertinence": "C",
+      "N1": [
+        "DE",
+        "AGCO"
+      ],
+      "N2": [
+        "ADM",
+        "BG",
+        "CTVA"
+      ],
+      "N3": []
+    },
+    {
+      "id": 95,
+      "nom": "Utilities & traitement de l'eau",
+      "pertinence": "C",
+      "N1": [
+        "AWK",
+        "XYL",
+        "WTRG",
+        "PNR"
+      ],
+      "N2": [
+        "ECL",
+        "ERII"
+      ],
+      "N3": []
+    },
+    {
+      "id": 96,
+      "nom": "Défensives boring (refuge)",
+      "pertinence": "C",
+      "N1": [
+        "PG",
+        "KO",
+        "PM",
+        "MO"
+      ],
+      "N2": [
+        "COST"
+      ],
+      "N3": []
+    },
+    {
+      "id": 97,
+      "nom": "Gestion déchets & recyclage",
+      "pertinence": "C",
+      "N1": [
+        "WM",
+        "RSG",
+        "GFL",
+        "CWST"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 98,
+      "nom": "ERP & legacy entreprise",
+      "pertinence": "C",
+      "N1": [
+        "ORCL",
+        "SAP",
+        "WDAY",
+        "PEGA"
+      ],
+      "N2": [
+        "ADSK"
+      ],
+      "N3": []
+    },
+    {
+      "id": 99,
+      "nom": "Design & productivité",
+      "pertinence": "C",
+      "N1": [
+        "ADBE",
+        "TEAM",
+        "DOCU"
+      ],
+      "N2": [
+        "INTU",
+        "BILL"
+      ],
+      "N3": []
+    },
+    {
+      "id": 100,
+      "nom": "Semi-conducteurs analogiques & puces auto",
+      "pertinence": "C",
+      "N1": [
+        "TXN",
+        "ADI",
+        "NXPI",
+        "MCHP",
+        "ON",
+        "MPWR"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 101,
+      "nom": "Réseaux & connectivité",
+      "pertinence": "C",
+      "N1": [
+        "CSCO",
+        "ANET",
+        "JNPR",
+        "FFIV",
+        "COMM"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 102,
+      "nom": "PC, smartphones & appareils",
+      "pertinence": "C",
+      "N1": [
+        "HPQ",
+        "LOGI",
+        "CRSR"
+      ],
+      "N2": [
+        "AAPL",
+        "DELL"
+      ],
+      "N3": []
+    },
+    {
+      "id": 103,
+      "nom": "Big pharma",
+      "pertinence": "C",
+      "N1": [
+        "LLY",
+        "JNJ",
+        "ABBV",
+        "MRK",
+        "PFE",
+        "BMY"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 104,
+      "nom": "Assurance santé / managed care",
+      "pertinence": "C",
+      "N1": [
+        "UNH",
+        "ELV",
+        "CI",
+        "CVS",
+        "HUM"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 105,
+      "nom": "Hôpitaux & distribution pharma",
+      "pertinence": "C",
+      "N1": [
+        "HCA",
+        "MCK",
+        "COR",
+        "CAH",
+        "DGX"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 106,
+      "nom": "Dispositifs médicaux",
+      "pertinence": "C",
+      "N1": [
+        "MDT",
+        "ABT",
+        "SYK",
+        "BSX",
+        "EW"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 107,
+      "nom": "Outils de labo & life sciences",
+      "pertinence": "C",
+      "N1": [
+        "TMO",
+        "DHR",
+        "A",
+        "IQV",
+        "MTD"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 108,
+      "nom": "Distribution & retail essentiel",
+      "pertinence": "C",
+      "N1": [
+        "WMT",
+        "COST",
+        "TGT",
+        "KR",
+        "DG"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 109,
+      "nom": "Alimentaire & boissons",
+      "pertinence": "C",
+      "N1": [
+        "KO",
+        "PEP",
+        "MDLZ",
+        "STZ",
+        "KDP"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 110,
+      "nom": "Hygiène & maison",
+      "pertinence": "C",
+      "N1": [
+        "PG",
+        "CL",
+        "KMB",
+        "CHD",
+        "CLX"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 111,
+      "nom": "Retail discrétionnaire & bricolage",
+      "pertinence": "C",
+      "N1": [
+        "HD",
+        "LOW",
+        "TJX",
+        "ROST",
+        "ULTA"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 112,
+      "nom": "Habillement & sport",
+      "pertinence": "C",
+      "N1": [
+        "NKE",
+        "LULU",
+        "TPR",
+        "RL",
+        "DECK"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 113,
+      "nom": "Automobile traditionnelle",
+      "pertinence": "C",
+      "N1": [
+        "GM",
+        "F",
+        "STLA",
+        "TM",
+        "HMC"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 114,
+      "nom": "Voyages & loisirs",
+      "pertinence": "C",
+      "N1": [
+        "BKNG",
+        "MAR",
+        "HLT",
+        "ABNB",
+        "RCL",
+        "EXPE"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 115,
+      "nom": "Médias & streaming",
+      "pertinence": "C",
+      "N1": [
+        "NFLX",
+        "WBD",
+        "PARA"
+      ],
+      "N2": [
+        "DIS",
+        "CMCSA"
+      ],
+      "N3": []
+    },
+    {
+      "id": 116,
+      "nom": "Télécoms",
+      "pertinence": "C",
+      "N1": [
+        "T",
+        "VZ",
+        "TMUS",
+        "LUMN"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 117,
+      "nom": "Conglomérats industriels",
+      "pertinence": "C",
+      "N1": [],
+      "N2": [
+        "HON",
+        "GE",
+        "MMM",
+        "EMR",
+        "ETN"
+      ],
+      "N3": []
+    },
+    {
+      "id": 118,
+      "nom": "Machines & équipement lourd",
+      "pertinence": "C",
+      "N1": [
+        "CAT",
+        "DE",
+        "PH",
+        "ITW",
+        "CMI"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 119,
+      "nom": "Assurance",
+      "pertinence": "C",
+      "N1": [
+        "PGR",
+        "TRV",
+        "CB",
+        "AIG",
+        "MET"
+      ],
+      "N2": [
+        "BRK.B"
+      ],
+      "N3": []
+    },
+    {
+      "id": 120,
+      "nom": "Gestion d'actifs & private equity",
+      "pertinence": "C",
+      "N1": [
+        "BLK",
+        "BX",
+        "KKR",
+        "APO",
+        "ARES"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 121,
+      "nom": "Bourses & données financières",
+      "pertinence": "C",
+      "N1": [
+        "ICE",
+        "CME",
+        "SPGI",
+        "MCO",
+        "NDAQ"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 122,
+      "nom": "Électricité & gaz régulé",
+      "pertinence": "C",
+      "N1": [
+        "SO",
+        "DUK",
+        "D",
+        "AEP",
+        "EXC",
+        "XEL"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 123,
+      "nom": "Chimie de base",
+      "pertinence": "C",
+      "N1": [
+        "DOW",
+        "LYB",
+        "CE",
+        "WLK",
+        "EMN"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 124,
+      "nom": "Construction maison & bois",
+      "pertinence": "C",
+      "N1": [
+        "DHI",
+        "LEN",
+        "PHM",
+        "NVR",
+        "BLDR"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 125,
+      "nom": "Majors intégrées",
+      "pertinence": "C",
+      "N1": [
+        "XOM",
+        "CVX",
+        "SHEL",
+        "TTE",
+        "BP"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 126,
+      "nom": "Midstream & pipelines",
+      "pertinence": "C",
+      "N1": [
+        "ET",
+        "EPD",
+        "KMI",
+        "WMB",
+        "ENB",
+        "OKE"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 127,
+      "nom": "Raffinage & aval (downstream)",
+      "pertinence": "C",
+      "N1": [
+        "MPC",
+        "VLO",
+        "PSX",
+        "DINO",
+        "PBF"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 128,
+      "nom": "Utilities renouvelables",
+      "pertinence": "C",
+      "N1": [
+        "NEE",
+        "BEP",
+        "BEPC",
+        "AES",
+        "CWEN"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 129,
+      "nom": "Banques universelles (money center)",
+      "pertinence": "C",
+      "N1": [
+        "JPM",
+        "BAC",
+        "C",
+        "WFC",
+        "USB"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 130,
+      "nom": "Banques d'investissement",
+      "pertinence": "C",
+      "N1": [
+        "GS",
+        "MS",
+        "JEF",
+        "EVR",
+        "LAZ"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 131,
+      "nom": "Banques régionales",
+      "pertinence": "C",
+      "N1": [
+        "PNC",
+        "TFC",
+        "RF",
+        "KEY",
+        "FITB",
+        "CFG"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 132,
+      "nom": "Paiements & cartes",
+      "pertinence": "C",
+      "N1": [
+        "V",
+        "MA",
+        "AXP",
+        "FIS",
+        "GPN"
+      ],
+      "N2": [
+        "PYPL"
+      ],
+      "N3": []
+    },
+    {
+      "id": 133,
+      "nom": "REITs tours télécom",
+      "pertinence": "C",
+      "N1": [
+        "AMT",
+        "CCI",
+        "SBAC"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 134,
+      "nom": "REITs industriels / logistique",
+      "pertinence": "C",
+      "N1": [
+        "PLD",
+        "COLD",
+        "EGP",
+        "FR",
+        "REXR"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 135,
+      "nom": "REITs résidentiels",
+      "pertinence": "C",
+      "N1": [
+        "AVB",
+        "EQR",
+        "INVH",
+        "MAA",
+        "UDR",
+        "SUI"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 136,
+      "nom": "REITs santé",
+      "pertinence": "C",
+      "N1": [
+        "WELL",
+        "VTR",
+        "DOC",
+        "OHI",
+        "MPW"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 137,
+      "nom": "REITs commerce / net lease",
+      "pertinence": "C",
+      "N1": [
+        "O",
+        "SPG",
+        "REG",
+        "KIM",
+        "ADC"
+      ],
+      "N2": [],
+      "N3": []
+    },
+    {
+      "id": 138,
+      "nom": "REITs hôtellerie",
+      "pertinence": "C",
+      "N1": [
+        "HST",
+        "PK",
+        "RHP",
+        "XHR"
+      ],
+      "N2": [],
+      "N3": []
+    }
+  ]
+}
