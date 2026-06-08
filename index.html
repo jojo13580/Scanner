@@ -1,1086 +1,846 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Sector Scanner</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Barlow+Condensed:wght@400;600;700;800&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SECTORSCAN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #05080d;
-    --panel: #0a0f18;
-    --panel2: #0f1520;
-    --border: #1c2a3a;
-    --green: #00e676;
-    --green2: #00ff88;
-    --red: #ff1744;
-    --yellow: #ffab00;
-    --orange: #ff6d00;
-    --blue: #2979ff;
-    --text: #cdd9e8;
-    --muted: #3d5470;
-    --white: #f0f4f8;
-  }
- 
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
- 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Barlow Condensed', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
- 
-  /* HEADER */
-  .header {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(5,8,13,0.97);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border);
-    padding: 10px 14px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
- 
-  .logo {
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: 0.1em;
-    color: var(--white);
-  }
-  .logo span { color: var(--green); }
- 
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
- 
-  .live-pill {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    background: #00e67615;
-    border: 1px solid #00e67630;
-    border-radius: 20px;
-    padding: 4px 10px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    color: var(--green);
-  }
- 
-  .live-dot {
-    width: 6px; height: 6px;
-    background: var(--green);
-    border-radius: 50%;
-    animation: blink 1.4s infinite;
-  }
- 
-  @keyframes blink {
-    0%,100% { opacity:1; } 50% { opacity:0.2; }
-  }
- 
-  .market-status {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    padding: 4px 8px;
-    border-radius: 6px;
-    border: 1px solid;
-  }
-  .market-status.open { color: var(--green); border-color: #00e67630; background: #00e67610; }
-  .market-status.closed { color: var(--red); border-color: #ff174430; background: #ff174410; }
- 
-  /* API KEY INPUT */
-  .api-setup {
-    margin: 12px;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-  }
- 
-  .api-setup input {
-    flex: 1;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 8px 10px;
-    color: var(--text);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    outline: none;
-  }
- 
-  .api-setup input:focus { border-color: var(--green); }
- 
-  .btn-connect {
-    background: var(--green);
-    color: #000;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 14px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    white-space: nowrap;
-  }
- 
-  /* MACRO BLOC */
-  .macro-strip {
-    display: flex;
-    gap: 8px;
-    padding: 0 12px 12px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .macro-strip::-webkit-scrollbar { display: none; }
- 
-  .macro-tile {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 8px 12px;
-    min-width: 90px;
-    flex-shrink: 0;
-  }
- 
-  .macro-name {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px;
-    color: var(--muted);
-    margin-bottom: 3px;
-  }
- 
-  .macro-price {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--white);
-  }
- 
-  .macro-chg {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    margin-top: 2px;
-  }
- 
-  .macro-chg.up { color: var(--green); }
-  .macro-chg.down { color: var(--red); }
- 
-  /* ALERT BANNER */
-  .alert-banner {
-    margin: 0 12px 12px;
-    background: linear-gradient(135deg, #00e67618, #00e67605);
-    border: 1px solid var(--green);
-    border-radius: 12px;
-    padding: 12px 14px;
-    display: none;
-    animation: glowPulse 2s infinite;
-  }
- 
-  .alert-banner.visible { display: flex; align-items: center; gap: 10px; }
- 
-  @keyframes glowPulse {
-    0%,100% { box-shadow: 0 0 12px #00e67625; }
-    50% { box-shadow: 0 0 25px #00e67650; }
-  }
- 
-  .alert-icon { font-size: 24px; }
-  .alert-body { flex: 1; }
-  .alert-title { font-size: 16px; font-weight: 800; color: var(--green); letter-spacing: 0.05em; }
-  .alert-sub { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 2px; }
-  .alert-time { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--green); }
- 
-  /* STATS ROW */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    padding: 0 12px 12px;
-  }
- 
-  .stat-box {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 8px;
-    text-align: center;
-  }
- 
-  .stat-val {
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--white);
-  }
-  .stat-val.green { color: var(--green); }
-  .stat-val.yellow { color: var(--yellow); }
-  .stat-val.orange { color: var(--orange); }
- 
-  .stat-lbl {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 8px;
-    color: var(--muted);
-    margin-top: 2px;
-    text-transform: uppercase;
-  }
- 
-  /* SECTOR CARDS */
-  .sectors-wrap {
-    padding: 0 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding-bottom: 100px;
-  }
- 
-  .sector-card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    overflow: hidden;
-    transition: border-color 0.3s;
-  }
- 
-  .sector-card.signal-ultimate {
-    border-color: var(--green);
-    box-shadow: 0 0 20px #00e67620;
-  }
- 
-  .sector-card.signal-partial {
-    border-color: var(--yellow);
-  }
- 
-  .sector-card.signal-volume {
-    border-color: var(--blue);
-  }
- 
-  .sector-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 14px;
-    cursor: pointer;
-    position: relative;
-  }
- 
-  .sector-header::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: var(--border);
-    transition: background 0.3s;
-  }
- 
-  .sector-card.signal-ultimate .sector-header::before { background: var(--green); }
-  .sector-card.signal-partial .sector-header::before { background: var(--yellow); }
-  .sector-card.signal-volume .sector-header::before { background: var(--blue); }
- 
-  .sector-left { flex: 1; }
- 
-  .sector-name {
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: var(--white);
-  }
- 
-  .sector-meta {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px;
-    color: var(--muted);
-    margin-top: 2px;
-  }
- 
-  .sector-right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
- 
-  /* SCORE CIRCLE */
-  .score-circle {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    border: 2px solid var(--border);
-    position: relative;
-    flex-shrink: 0;
-  }
- 
-  .score-val {
-    font-size: 16px;
-    font-weight: 800;
-    line-height: 1;
-  }
- 
-  .score-label {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 7px;
-    color: var(--muted);
-  }
- 
-  .score-0 { border-color: var(--muted); }
-  .score-0 .score-val { color: var(--muted); }
-  .score-low { border-color: var(--red); }
-  .score-low .score-val { color: var(--red); }
-  .score-mid { border-color: var(--yellow); }
-  .score-mid .score-val { color: var(--yellow); }
-  .score-high { border-color: var(--orange); }
-  .score-high .score-val { color: var(--orange); }
-  .score-max { border-color: var(--green); box-shadow: 0 0 10px #00e67640; }
-  .score-max .score-val { color: var(--green); }
- 
-  .signal-badges {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
- 
-  .badge {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 8px;
-    padding: 2px 6px;
-    border-radius: 4px;
-    border: 1px solid;
-    white-space: nowrap;
-  }
- 
-  .badge-green { color: var(--green); border-color: #00e67630; background: #00e67610; }
-  .badge-yellow { color: var(--yellow); border-color: #ffab0030; background: #ffab0010; }
-  .badge-blue { color: var(--blue); border-color: #2979ff30; background: #2979ff10; }
-  .badge-red { color: var(--red); border-color: #ff174430; background: #ff174410; }
-  .badge-muted { color: var(--muted); border-color: var(--border); }
- 
-  /* TICKER LIST */
-  .sector-body {
-    padding: 0 14px 12px;
-    display: none;
-  }
- 
-  .sector-body.open { display: block; }
- 
-  .ticker-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 10px;
-  }
- 
-  .ticker-item {
-    background: var(--panel2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 6px 10px;
-    min-width: 90px;
-  }
- 
-  .ticker-sym {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--white);
-  }
- 
-  .ticker-pct {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-    font-weight: 700;
-    margin-top: 2px;
-  }
-  .ticker-pct.up { color: var(--green); }
-  .ticker-pct.down { color: var(--red); }
-  .ticker-pct.flat { color: var(--muted); }
- 
-  .ticker-vol {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px;
-    margin-top: 2px;
-  }
-  .ticker-vol.over { color: var(--green); }
-  .ticker-vol.under { color: var(--muted); }
- 
-  .ticker-item.ultimate {
-    border-color: var(--green);
-    background: #00e67608;
-  }
- 
-  /* VOLUME BAR */
-  .vol-section {
-    margin-top: 8px;
-  }
- 
-  .vol-header {
-    display: flex;
-    justify-content: space-between;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px;
-    color: var(--muted);
-    margin-bottom: 4px;
-  }
- 
-  .vol-bar {
-    height: 5px;
-    background: var(--border);
-    border-radius: 3px;
-    overflow: hidden;
-  }
- 
-  .vol-fill {
-    height: 100%;
-    border-radius: 3px;
-    transition: width 0.6s ease;
-  }
- 
-  .vol-fill.over { background: var(--green); }
-  .vol-fill.under { background: var(--muted); }
-  .vol-fill.partial { background: var(--yellow); }
- 
-  /* REFRESH BAR */
-  .refresh-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0; right: 0;
-    background: rgba(5,8,13,0.97);
-    border-top: 1px solid var(--border);
-    padding: 10px 14px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    z-index: 100;
-  }
- 
-  .refresh-lbl {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    color: var(--muted);
-    white-space: nowrap;
-  }
- 
-  .refresh-track {
-    flex: 1;
-    height: 3px;
-    background: var(--border);
-    border-radius: 2px;
-    overflow: hidden;
-  }
- 
-  .refresh-fill {
-    height: 100%;
-    background: var(--green);
-    border-radius: 2px;
-    width: 100%;
-    transition: width 1s linear;
-  }
- 
-  .refresh-timer {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-    color: var(--green);
-    min-width: 28px;
-    text-align: right;
-  }
- 
-  .btn-refresh {
-    background: var(--panel2);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 5px 10px;
-    color: var(--text);
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 13px;
-    cursor: pointer;
-  }
- 
-  /* JOURNAL */
-  .journal-section {
-    margin: 0 12px 12px;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-  }
- 
-  .journal-header {
-    padding: 10px 14px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--border);
-    cursor: pointer;
-  }
- 
-  .journal-title {
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
- 
-  .journal-body {
-    padding: 10px 14px;
-    display: none;
-    max-height: 200px;
-    overflow-y: auto;
-  }
- 
-  .journal-body.open { display: block; }
- 
-  .journal-entry {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    color: var(--text);
-    padding: 6px 0;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    gap: 8px;
-  }
- 
-  .journal-entry:last-child { border-bottom: none; }
-  .je-time { color: var(--muted); white-space: nowrap; }
-  .je-sector { color: var(--green); }
-  .je-score { color: var(--yellow); }
- 
-  .empty-journal {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    color: var(--muted);
-    text-align: center;
-    padding: 20px;
-  }
- 
-  .loading-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(5,8,13,0.85);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 200;
-    flex-direction: column;
-    gap: 12px;
-  }
- 
-  .spinner {
-    width: 40px; height: 40px;
-    border: 3px solid var(--border);
-    border-top-color: var(--green);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
- 
-  @keyframes spin { to { transform: rotate(360deg); } }
- 
-  .loading-text {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-    color: var(--green);
-  }
- 
-  .section-title {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    padding: 0 12px 8px;
-  }
+:root{
+  --bg:#080b14; --bg2:#0d1320; --panel:#0f1626; --panel2:#141d31;
+  --border:#1d2740; --border2:#2a3656;
+  --text:#e9edf6; --muted:#8b95ad; --faint:#5a6379;
+  --green:#3fd07f; --red:#ff5d6c; --amber:#ff9f2e; --yellow:#ffd84d;
+  --ultime:#b794ff; --ultime2:#8b5cf6; --blue:#4c8dff;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,monospace;
+  --sans:'Archivo',system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font-family:var(--sans);background:var(--bg);color:var(--text);
+  line-height:1.45;font-size:14px;
+  background-image:radial-gradient(1200px 600px at 80% -10%,rgba(76,141,255,.06),transparent 60%);
+  padding-bottom:40px;
+}
+.tnum{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.up{color:var(--green)} .dn{color:var(--red)} .flat{color:var(--muted)}
+.wrap{max-width:920px;margin:0 auto;padding:0 12px}
+ 
+/* ---------- header ---------- */
+header{
+  position:sticky;top:0;z-index:30;background:rgba(8,11,20,.88);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--border);
+}
+.hbar{display:flex;align-items:center;gap:10px;padding:11px 12px;max-width:920px;margin:0 auto}
+.logo{font-weight:800;letter-spacing:.06em;font-size:16px}
+.logo .dot{color:var(--blue)}
+.hstat{font-family:var(--mono);font-size:10.5px;color:var(--muted);display:flex;align-items:center;gap:5px}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--faint)}
+.pulse.on{background:var(--green);box-shadow:0 0 8px var(--green);animation:bp 1.6s infinite}
+@keyframes bp{0%,100%{opacity:1}50%{opacity:.35}}
+.hsp{flex:1}
+.btn{
+  font-family:var(--sans);font-weight:600;font-size:12px;cursor:pointer;
+  background:var(--panel2);color:var(--text);border:1px solid var(--border2);
+  border-radius:9px;padding:8px 12px;white-space:nowrap;transition:.15s;
+}
+.btn:hover{border-color:var(--blue)}
+.btn:active{transform:translateY(1px)}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.sm{padding:6px 9px;font-size:11px;border-radius:7px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+ 
+/* ---------- key panel ---------- */
+.keybar{display:flex;gap:8px;align-items:center;padding:10px 12px;max-width:920px;margin:0 auto;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.keybar input{
+  flex:1;min-width:160px;font-family:var(--mono);font-size:12px;
+  background:var(--bg2);color:var(--text);border:1px solid var(--border2);
+  border-radius:8px;padding:9px 10px;
+}
+.keybar input:focus{outline:none;border-color:var(--blue)}
+.keybar .lbl{font-size:11px;color:var(--muted);font-weight:600}
+ 
+/* ---------- market banner ---------- */
+.macro{display:flex;gap:8px;overflow-x:auto;padding:11px 12px 12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.macro::-webkit-scrollbar{display:none}
+.mcard{
+  flex:0 0 auto;min-width:104px;background:var(--panel);border:1px solid var(--border);
+  border-radius:11px;padding:9px 11px;
+}
+.mcard .mk{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.mcard .mv{font-family:var(--mono);font-size:15px;font-weight:700;margin-top:2px}
+.mcard .mc{font-family:var(--mono);font-size:11px;font-weight:500;margin-top:1px}
+ 
+/* ---------- alert ---------- */
+.alert{
+  margin:4px 12px 0;max-width:896px;border-radius:13px;padding:13px 15px;
+  background:linear-gradient(120deg,rgba(139,92,246,.22),rgba(139,92,246,.06));
+  border:1px solid var(--ultime2);display:none;align-items:center;gap:12px;
+  animation:apulse 2s infinite;
+}
+.alert.show{display:flex}
+@keyframes apulse{0%,100%{box-shadow:0 0 0 0 rgba(139,92,246,.0)}50%{box-shadow:0 0 22px 0 rgba(139,92,246,.35)}}
+.alert .ico{font-size:22px}
+.alert .at{font-weight:800;letter-spacing:.04em;color:var(--ultime)}
+.alert .as{font-size:12px;color:var(--muted);margin-top:1px}
+ 
+/* ---------- counters ---------- */
+.counts{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px}
+.cc{background:var(--panel);border:1px solid var(--border);border-radius:11px;padding:11px 8px;text-align:center}
+.cc .n{font-family:var(--mono);font-size:22px;font-weight:700;line-height:1}
+.cc .l{font-size:9.5px;color:var(--muted);font-weight:700;letter-spacing:.04em;margin-top:5px;text-transform:uppercase}
+.cc.u{border-color:rgba(139,92,246,.5)} .cc.u .n{color:var(--ultime)}
+.cc.f .n{color:var(--amber)} .cc.v .n{color:var(--yellow)}
+ 
+/* ---------- controls ---------- */
+.ctrls{display:flex;gap:8px;align-items:center;padding:0 12px 10px;flex-wrap:wrap}
+.ctrls .grow{flex:1;min-width:120px}
+.search{
+  font-family:var(--mono);font-size:12px;background:var(--bg2);color:var(--text);
+  border:1px solid var(--border2);border-radius:8px;padding:8px 10px;width:100%;
+}
+.search:focus{outline:none;border-color:var(--blue)}
+.chips{display:flex;gap:6px}
+.chip{font-size:11px;font-weight:600;padding:6px 10px;border-radius:20px;border:1px solid var(--border2);background:var(--panel);color:var(--muted);cursor:pointer}
+.chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.toggle{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);cursor:pointer;user-select:none}
+.tg{width:34px;height:19px;border-radius:11px;background:var(--border2);position:relative;transition:.15s;flex:0 0 auto}
+.tg::after{content:"";position:absolute;width:15px;height:15px;border-radius:50%;background:#fff;top:2px;left:2px;transition:.15s}
+.toggle.on .tg{background:var(--blue)} .toggle.on .tg::after{left:17px}
+ 
+/* progress */
+.prog{padding:0 12px 8px;display:none}
+.prog.show{display:block}
+.pbar{height:5px;background:var(--panel2);border-radius:3px;overflow:hidden}
+.pfill{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--ultime2));transition:width .2s}
+.ptxt{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:5px}
+ 
+/* ---------- bloc list ---------- */
+#list{padding:0 12px;display:flex;flex-direction:column;gap:9px}
+.bloc{
+  background:var(--panel);border:1px solid var(--border);border-radius:13px;
+  overflow:hidden;transition:transform .35s cubic-bezier(.2,.7,.2,1),border-color .2s;
+}
+.bloc.t-ULTIME{border-color:var(--ultime2);background:linear-gradient(180deg,rgba(139,92,246,.10),var(--panel) 55%)}
+.bloc.t-FORT{border-color:rgba(255,159,46,.4)}
+.bhead{display:flex;align-items:center;gap:10px;padding:12px 13px;cursor:pointer}
+.brank{font-family:var(--mono);font-size:11px;color:var(--faint);width:20px;text-align:right;flex:0 0 auto}
+.bmain{flex:1;min-width:0}
+.bname{font-weight:700;font-size:14px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.bname .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.pert{font-family:var(--mono);font-size:10px;font-weight:700;width:17px;height:17px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.pert.A{background:rgba(63,208,127,.18);color:var(--green)}
+.pert.B{background:rgba(255,159,46,.18);color:var(--amber)}
+.pert.C{background:rgba(139,149,173,.16);color:var(--muted)}
+.bsub{font-size:11px;color:var(--muted);margin-top:3px;font-family:var(--mono)}
+.tier{font-family:var(--sans);font-size:10px;font-weight:800;letter-spacing:.04em;padding:4px 9px;border-radius:7px;flex:0 0 auto}
+.tier.ULTIME{background:var(--ultime2);color:#fff}
+.tier.FORT{background:rgba(255,159,46,.18);color:var(--amber);border:1px solid rgba(255,159,46,.4)}
+.tier.VOL_OK{background:rgba(255,216,77,.14);color:var(--yellow);border:1px solid rgba(255,216,77,.32)}
+.score{font-family:var(--mono);font-size:20px;font-weight:700;flex:0 0 auto;text-align:right;min-width:42px}
+.chev{color:var(--faint);font-size:12px;transition:transform .2s;flex:0 0 auto}
+.bloc.open .chev{transform:rotate(90deg)}
+ 
+.chips-row{display:flex;flex-wrap:wrap;gap:5px;padding:0 13px 12px}
+.tk{font-family:var(--mono);font-size:11px;font-weight:500;padding:3px 8px;border-radius:7px;border:1px solid var(--border2);background:var(--bg2);color:var(--muted);display:inline-flex;align-items:center;gap:5px}
+.tk.g{color:var(--green);border-color:rgba(63,208,127,.35);background:rgba(63,208,127,.08)}
+.tk.buy{color:var(--green);border-color:var(--green);background:rgba(63,208,127,.14);font-weight:700}
+.tk.dead{color:var(--faint);text-decoration:line-through;opacity:.7}
+.tk .lvl{font-size:8.5px;opacity:.6}
+ 
+.detail{display:none;border-top:1px solid var(--border);background:var(--bg2)}
+.bloc.open .detail{display:block}
+.cond{display:flex;flex-wrap:wrap;gap:6px;padding:11px 13px 4px}
+.cb{font-family:var(--mono);font-size:10px;padding:4px 8px;border-radius:6px;border:1px solid var(--border2);color:var(--muted)}
+.cb.ok{color:var(--green);border-color:rgba(63,208,127,.4);background:rgba(63,208,127,.08)}
+.cb.no{color:var(--faint)}
+.mtbl{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px}
+.mtbl th{text-align:right;color:var(--faint);font-weight:500;font-size:9.5px;text-transform:uppercase;letter-spacing:.03em;padding:8px 8px 6px;border-bottom:1px solid var(--border)}
+.mtbl th:first-child{text-align:left}
+.mtbl td{text-align:right;padding:7px 8px;border-bottom:1px solid rgba(29,39,64,.5);color:var(--text)}
+.mtbl td:first-child{text-align:left;font-weight:500}
+.mtbl tr:last-child td{border-bottom:none}
+.lvltag{font-size:8.5px;color:var(--faint);margin-left:5px}
+.noliq{color:var(--red);font-weight:700}
+.rangebar{display:inline-block;width:46px;height:5px;border-radius:3px;background:var(--border2);position:relative;vertical-align:middle}
+.rangebar i{position:absolute;top:-1.5px;width:3px;height:8px;border-radius:2px;background:var(--blue)}
+.capi{color:var(--muted)}
+ 
+.empty{text-align:center;color:var(--muted);padding:40px 16px;font-size:13px}
+.empty b{color:var(--text)}
+ 
+/* cleaning */
+.clean{margin:14px 12px 0;background:var(--panel);border:1px dashed var(--border2);border-radius:12px;padding:0 13px}
+.clean summary{cursor:pointer;padding:11px 0;font-size:12px;font-weight:600;color:var(--muted);list-style:none}
+.clean summary::-webkit-details-marker{display:none}
+.clean[open] summary{border-bottom:1px solid var(--border)}
+.deadlist{display:flex;flex-wrap:wrap;gap:5px;padding:11px 0}
+ 
+footer{max-width:920px;margin:22px auto 0;padding:0 16px;color:var(--faint);font-size:10.5px;line-height:1.6;text-align:center}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--border2);color:var(--text);padding:10px 16px;border-radius:10px;font-size:12.5px;z-index:60;box-shadow:0 8px 30px rgba(0,0,0,.5);opacity:0;transition:.25s;pointer-events:none}
+.toast.show{opacity:1}
+@media (max-width:430px){
+  .counts{gap:6px}
+  .cc .n{font-size:19px}
+  .score{font-size:18px;min-width:36px}
+}
 </style>
 </head>
 <body>
  
-<div class="loading-overlay" id="loadingOverlay" style="display:none!important">
-  <div class="spinner"></div>
-  <div class="loading-text" id="loadingText">Chargement des données...</div>
-</div>
+<header>
+  <div class="hbar">
+    <div class="logo">SECTOR<span class="dot">SCAN</span></div>
+    <div class="hstat"><span class="pulse" id="pulse"></span><span id="statusTxt">hors ligne</span></div>
+    <div class="hsp"></div>
+    <button class="btn sm" id="rescanBtn" disabled>Rescan complet</button>
+  </div>
+  <div class="keybar">
+    <span class="lbl">Clé Polygon</span>
+    <input id="keyInput" type="password" placeholder="MA_CLE" autocomplete="off" spellcheck="false">
+    <button class="btn pri sm" id="connectBtn">Connecter</button>
+  </div>
+</header>
  
-<!-- HEADER -->
-<div class="header">
-  <div class="logo">SECTOR<span>SCAN</span></div>
-  <div class="header-right">
-    <div class="market-status" id="marketStatus">--</div>
-    <div class="live-pill">
-      <div class="live-dot"></div>
-      LIVE
+<div class="macro" id="macro"></div>
+ 
+<div class="wrap">
+  <div class="alert" id="alert">
+    <div class="ico">🚨</div>
+    <div><div class="at">SIGNAL ULTIME</div><div class="as" id="alertSub"></div></div>
+  </div>
+ 
+  <div class="counts">
+    <div class="cc u"><div class="n" id="cUlt">0</div><div class="l">Ultime 🚨</div></div>
+    <div class="cc f"><div class="n" id="cFort">0</div><div class="l">Fort 🟠</div></div>
+    <div class="cc v"><div class="n" id="cVol">0</div><div class="l">Vol OK 🟡</div></div>
+    <div class="cc"><div class="n" id="cSec">0</div><div class="l">Secteurs</div></div>
+  </div>
+ 
+  <div class="ctrls">
+    <div class="grow"><input class="search" id="search" placeholder="filtrer (nom ou ticker)…"></div>
+    <div class="chips" id="pertChips">
+      <span class="chip on" data-p="all">Tous</span>
+      <span class="chip" data-p="A">A</span>
+      <span class="chip" data-p="B">B</span>
+      <span class="chip" data-p="C">C</span>
     </div>
   </div>
-</div>
- 
-<!-- API KEY -->
-<div class="api-setup" id="apiSetup">
-  <input type="password" id="apiKeyInput" placeholder="Colle ta clé API Polygon.io ici..." />
-  <button class="btn-connect" onclick="connectAPI()">CONNECTER</button>
-</div>
- 
-<!-- ALERT BANNER -->
-<div class="alert-banner" id="alertBanner">
-  <div class="alert-icon">🚨</div>
-  <div class="alert-body">
-    <div class="alert-title" id="alertTitle">SIGNAL ULTIME</div>
-    <div class="alert-sub" id="alertSub">--</div>
+  <div class="ctrls">
+    <label class="toggle on" id="tgLit"><span class="tg"></span>Allumés seuls</label>
+    <label class="toggle" id="tgAuto"><span class="tg"></span>Auto 60s</label>
+    <label class="toggle" id="tgAlert"><span class="tg"></span>Alertes 🔔</label>
+    <div class="hsp"></div>
+    <span class="hstat" id="lastMaj"></span>
   </div>
-  <div class="alert-time" id="alertTime">--</div>
-</div>
  
-<!-- MACRO -->
-<div class="section-title">MACRO</div>
-<div class="macro-strip" id="macroStrip">
-  <div class="macro-tile"><div class="macro-name">S&P 500</div><div class="macro-price" id="m-spy">--</div><div class="macro-chg" id="mc-spy">--</div></div>
-  <div class="macro-tile"><div class="macro-name">NASDAQ</div><div class="macro-price" id="m-qqq">--</div><div class="macro-chg" id="mc-qqq">--</div></div>
-  <div class="macro-tile"><div class="macro-name">BITCOIN</div><div class="macro-price" id="m-btc">--</div><div class="macro-chg" id="mc-btc">--</div></div>
-  <div class="macro-tile"><div class="macro-name">OR</div><div class="macro-price" id="m-gld">--</div><div class="macro-chg" id="mc-gld">--</div></div>
-  <div class="macro-tile"><div class="macro-name">VIX</div><div class="macro-price" id="m-vix">--</div><div class="macro-chg" id="mc-vix">--</div></div>
-</div>
- 
-<!-- STATS -->
-<div class="stats-row">
-  <div class="stat-box"><div class="stat-val green" id="st-ultimate">0</div><div class="stat-lbl">ULTIME 🚨</div></div>
-  <div class="stat-box"><div class="stat-val orange" id="st-partial">0</div><div class="stat-lbl">FORT 🟠</div></div>
-  <div class="stat-box"><div class="stat-val yellow" id="st-volume">0</div><div class="stat-lbl">VOL OK 🟡</div></div>
-  <div class="stat-box"><div class="stat-val" id="st-total">18</div><div class="stat-lbl">SECTEURS</div></div>
-</div>
- 
-<!-- JOURNAL -->
-<div class="journal-section">
-  <div class="journal-header" onclick="toggleJournal()">
-    <div class="journal-title">📋 Journal de bord</div>
-    <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted)" id="journalCount">0 signaux</div>
+  <div class="prog" id="prog">
+    <div class="pbar"><div class="pfill" id="pfill"></div></div>
+    <div class="ptxt" id="ptxt"></div>
   </div>
-  <div class="journal-body" id="journalBody">
-    <div class="empty-journal" id="emptyJournal">Aucun signal enregistré pour l'instant</div>
-  </div>
+ 
+  <div id="list"></div>
+ 
+  <details class="clean" id="cleanBox" style="display:none">
+    <summary id="cleanSum">⚠︎ Tickers invalides</summary>
+    <div class="deadlist" id="deadlist"></div>
+  </details>
+ 
+  <footer>
+    Outil de <b>détection</b> uniquement. Aucun ordre, aucun stop, aucune gestion de position (réf. spec §9–10, non implémentées par choix).<br>
+    Données Polygon.io différées ~15 min. Stratégie non éprouvée en réel — ce n'est pas un conseil en investissement.
+  </footer>
 </div>
  
-<!-- SECTORS -->
-<div class="section-title" style="margin-top:12px">SECTEURS</div>
-<div class="sectors-wrap" id="sectorsWrap"></div>
- 
-<!-- REFRESH BAR -->
-<div class="refresh-bar">
-  <div class="refresh-lbl">REFRESH</div>
-  <div class="refresh-track"><div class="refresh-fill" id="refreshFill"></div></div>
-  <div class="refresh-timer" id="refreshTimer">60s</div>
-  <button class="btn-refresh" onclick="fetchAllData()">↻</button>
-</div>
+<div class="toast" id="toast"></div>
  
 <script>
-// ==================== CONFIG ====================
-const SECTORS = [
-  { name: "QUANTIQUE", tickers: ["IONQ","RGTI","QBTS","QUBT","ARQQ"] },
-  { name: "LIDAR +", tickers: ["HSAI","OUST","INVZ","AEVA"] },
-  { name: "LIDAR -", tickers: ["HSAI","OUST","INVZ","EEVA","MVIS","LIDR"] },
-  { name: "MINÉRAUX LARGES", tickers: ["MP","UAMY","UUUU","USAR"] },
-  { name: "LITHIUM", tickers: ["LAC","SLI"] },
-  { name: "TERRE RARE", tickers: ["MP","USAR","AREC","CRML"] },
-  { name: "URANIUM", tickers: ["UEC","UUUU","URG","LEU"] },
-  { name: "URANIUM ÉMERGENT", tickers: ["DNN","NXE","EU","UROY"] },
-  { name: "URANIUM AVANCÉ+ÉMERGENT", tickers: ["UEC","UUUU","URG","LEU","DNN","NXE","EU","UROY"] },
-  { name: "RÉACTEUR NUCLÉAIRE", tickers: ["SMR","OKLO","NNE","LTBR"] },
-  { name: "RÉACTEUR NUCLÉAIRE LARGE", tickers: ["BWXT","LEU","SMR","OKLO","NNE","LTBR"] },
-  { name: "RÉACTEUR PUR JOUEUR", tickers: ["SMR","OKLO","NNE"] },
-  { name: "LASER MILITAIRE", tickers: ["LASR"] },
-  { name: "LASER INDUSTRIE", tickers: ["IPGP","LASE"] },
-  { name: "COMPOSANT LASER PHOTONIQUE", tickers: ["LITE","COHR","IPGP","AAOI","LASR"] },
-  { name: "SEMI-CONDUCTEUR PHOTONIQUE", tickers: ["CIEN","FN","VIAV"] },
-  { name: "PUCE DÉPÔT COUCHE MINCE GRAVURE", tickers: ["AMAT","LRCX","ACMR"] },
-  { name: "PUCE MÉTROLOGIE INSPECTION", tickers: ["KLAC","ONTO","NVMI"] }
-];
+"use strict";
+/* ============================================================
+   SECTORSCAN — détecteur de réveils thématiques (spec §1–§12)
+   Détection seule : indicateurs, score, tri, affichage.
+   PAS de stop / palier / rachat / ordre (spec §9–10).
+   ============================================================ */
  
-const MACRO_TICKERS = ["SPY","QQQ","GLD"];
-const JOURNAL = [];
-let API_KEY = localStorage.getItem('polygonKey') || 'MRkia9WkO2ZWYFp8CRHs6RZwsqX4r7xe';
-let tickerData = {};
-let refreshInterval = null;
-let countdownInterval = null;
-let refreshSeconds = 60;
-let openSectors = new Set();
+const CONFIG = {
+  // ---- Polygon ----
+  API: "https://api.polygon.io",
+  KEY_PLACEHOLDER: "MA_CLE",     // jamais la vraie clé en dur. Saisie au runtime ou ici.
+  HISTORY_DAYS: 400,             // jours calendaires de barres journalières à charger (≈ 1 an + marge)
+  CONCURRENCY: 6,                // fetchs Polygon en parallèle (rescan complet)
+  REFRESH_SECONDS: 60,
  
-// ==================== INIT ====================
-window.onload = () => {
-  buildSectorCards();
-  updateMarketStatus();
-  document.getElementById('apiSetup').style.display = 'none';
-  fetchAllData();
-  startRefreshTimer();
+  // ---- seuils (spec §12 — PRINCIPES, pas des vérités ; à affiner) ----
+  LIQUIDITY_FLOOR: 1_000_000,    // dollarVol min pour sortir de la zone morte
+  DORMANCY_RANGE_MAX: 0.35,      // (close-bas52) / (haut52-bas52) <  → secteur encore bas
+  PERF20_MAX: 0.40,              // perf 20j <  → pas déjà parti
+  ABNORMAL_VOL_MULT: 2.5,        // vol[j] groupe > x × volMA20 groupe  → afflux anormal
+  MARKET_OUTPERF_MARGIN: 0.0,    // var(groupe N1) - var(SPY) >  → bat l'indice
+ 
+  // ---- score / tri ----
+  WAGON_COMP: 0.7,               // capacité des wagons (N2) à rattraper les failles moteur (N1)
+  PERT_MULT: { A: 1.12, B: 1.05, C: 1.0 },  // à signal égal, A passe devant C
+  FORT_SCORE_MIN: 60,            // Indicateur 1 + score ≥ ce seuil → tier FORT
 };
  
-function connectAPI() {
-  const key = document.getElementById('apiKeyInput').value.trim();
-  if (!key) { alert('Entre ta clé API !'); return; }
-  API_KEY = key;
-  localStorage.setItem('polygonKey', key);
-  document.getElementById('apiSetup').style.display = 'none';
-  fetchAllData();
-  startRefreshTimer();
+// instruments du bandeau marché — proxies ETF/actions (tous dans le feed Stocks Starter).
+// Pour passer aux vrais indices/crypto si ton abonnement les couvre : voir notes en bas.
+const MACRO = [
+  { t:"SPY",  label:"S&P 500" },
+  { t:"QQQ",  label:"Nasdaq" },
+  { t:"DIA",  label:"Dow" },
+  { t:"GLD",  label:"Or" },
+  { t:"IBIT", label:"Bitcoin" },   // proxy BTC coté US ; ou X:BTCUSD via endpoint crypto
+  { t:"VIXY", label:"Vol." },      // proxy volatilité ; ou I:VIX via endpoint indices
+];
+const MARKET_REF = "SPY";          // référence pour la surperformance (spec §6 cond 8)
+ 
+/* ------------------------------------------------------------------ */
+const $ = id => document.getElementById(id);
+const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+const fmtPct = v => (v>=0?"+":"")+(v*100).toFixed(2)+"%";
+const cls = v => v>0?"up":v<0?"dn":"flat";
+function fmtUSD(v){
+  if(v==null||!isFinite(v)) return "—";
+  if(v>=1e9) return "$"+(v/1e9).toFixed(1)+"B";
+  if(v>=1e6) return "$"+(v/1e6).toFixed(1)+"M";
+  if(v>=1e3) return "$"+(v/1e3).toFixed(0)+"k";
+  return "$"+v.toFixed(0);
+}
+function ymd(d){ return d.toISOString().slice(0,10); }
+ 
+// stockage clé — localStorage si dispo (site déployé), sinon mémoire (aperçu/sandbox)
+let MEM_KEY = "";
+function getKey(){
+  try{ const k=localStorage.getItem("sectorscan_key"); if(k) return k; }catch(e){}
+  return MEM_KEY;
+}
+function setKey(k){
+  MEM_KEY=k||"";
+  try{ if(k) localStorage.setItem("sectorscan_key",k); }catch(e){}
 }
  
-// ==================== MARKET STATUS ====================
-function updateMarketStatus() {
-  const now = new Date();
-  const nyTime = new Date(now.toLocaleString("en-US", {timeZone: "America/New_York"}));
-  const h = nyTime.getHours(), m = nyTime.getMinutes(), d = nyTime.getDay();
-  const isWeekday = d >= 1 && d <= 5;
-  const afterOpen = h > 9 || (h === 9 && m >= 30);
-  const beforeClose = h < 16;
-  const isOpen = isWeekday && afterOpen && beforeClose;
-  const el = document.getElementById('marketStatus');
-  el.textContent = isOpen ? 'MARCHÉ OUVERT' : 'MARCHÉ FERMÉ';
-  el.className = 'market-status ' + (isOpen ? 'open' : 'closed');
+let toastTimer=null;
+function toast(msg){
+  const t=$("toast"); t.textContent=msg; t.classList.add("show");
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),2600);
 }
  
-// ==================== BUILD CARDS ====================
-function buildSectorCards() {
-  const wrap = document.getElementById('sectorsWrap');
-  wrap.innerHTML = '';
-  SECTORS.forEach((s, i) => {
-    const card = document.createElement('div');
-    card.className = 'sector-card';
-    card.id = `card-${i}`;
-    card.innerHTML = `
-      <div class="sector-header" onclick="toggleSector(${i})">
-        <div class="sector-left">
-          <div class="sector-name">${s.name}</div>
-          <div class="sector-meta" id="meta-${i}">${s.tickers.length} tickers · En attente...</div>
-        </div>
-        <div class="sector-right">
-          <div class="signal-badges" id="badges-${i}">
-            <div class="badge badge-muted">--</div>
-          </div>
-          <div class="score-circle score-0" id="score-${i}">
-            <div class="score-val">--</div>
-            <div class="score-label">SCORE</div>
-          </div>
-        </div>
-      </div>
-      <div class="sector-body" id="body-${i}">
-        <div class="ticker-grid" id="tickers-${i}"></div>
-        <div class="vol-section">
-          <div class="vol-header">
-            <span>VOLUME TOTAL SECTEUR</span>
-            <span id="vol-pct-${i}">--</span>
-          </div>
-          <div class="vol-bar"><div class="vol-fill under" id="vol-bar-${i}" style="width:0%"></div></div>
-        </div>
-      </div>
-    `;
-    wrap.appendChild(card);
-  });
+/* ---------------- état ---------------- */
+const STATE = {
+  blocs: [],                 // bibliothèque (blocs.json)
+  universe: [],              // tickers uniques (N1∪N2∪N3 + macro)
+  bars: {},                  // ticker -> [{t,o,h,l,c,v}]  (trié asc)
+  metrics: {},               // ticker -> objet métriques
+  dead: new Set(),           // tickers sans données (liste de nettoyage)
+  capCache: {},              // ticker -> market cap (chargé à la demande)
+  results: [],               // résultats blocs triés
+  marketVar: 0,
+  lastUltimes: new Set(),    // pour ne notifier que les NOUVEAUX ultimes
+  scanning: false,
+  filterPert: "all",
+  search: "",
+  litOnly: true,
+  autoTimer: null,
+  audioCtx: null,
+  openIds: new Set(),        // blocs dépliés (persistés entre re-rendus)
+};
+ 
+/* ---------------- Polygon ---------------- */
+async function poly(path){
+  const key=getKey();
+  const sep = path.includes("?") ? "&" : "?";
+  const url = CONFIG.API + path + sep + "apiKey=" + encodeURIComponent(key);
+  for(let attempt=0; attempt<3; attempt++){
+    let r;
+    try{ r = await fetch(url); }
+    catch(e){ if(attempt<2){ await sleep(400*(attempt+1)); continue; } throw new Error("réseau"); }
+    if(r.status===429){ await sleep(700*(attempt+1)); continue; }      // rate limit → patiente
+    if(r.status===401||r.status===403) throw new Error("clé refusée");
+    if(!r.ok){ if(attempt<2){ await sleep(400); continue; } throw new Error("HTTP "+r.status); }
+    return r.json();
+  }
+  throw new Error("échec après retries");
+}
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+ 
+// barres journalières d'un ticker (≈ 1 an d'historique)
+async function fetchAggs(ticker){
+  const to = new Date();
+  const from = new Date(Date.now() - CONFIG.HISTORY_DAYS*864e5);
+  const path = `/v2/aggs/ticker/${encodeURIComponent(ticker)}/range/1/day/${ymd(from)}/${ymd(to)}?adjusted=true&sort=asc&limit=500`;
+  const j = await poly(path);
+  return (j && j.results) ? j.results : [];   // [] = invalide / sans données
 }
  
-function toggleSector(i) {
-  const body = document.getElementById(`body-${i}`);
-  if (openSectors.has(i)) {
-    openSectors.delete(i);
-    body.classList.remove('open');
-  } else {
-    openSectors.add(i);
-    body.classList.add('open');
+// barres groupées d'UNE journée pour TOUT le marché US (1 seul appel → refresh léger)
+async function fetchGroupedDay(dateStr){
+  const j = await poly(`/v2/aggs/grouped/locale/us/market/stocks/${dateStr}?adjusted=true`);
+  const map={};
+  if(j && j.results) for(const b of j.results) map[b.T]=b;   // b.T = ticker
+  return map;
+}
+ 
+/* ---------------- métriques (spec §4) ---------------- */
+function computeMetrics(bars){
+  if(!bars || bars.length<2) return null;
+  const n=bars.length;
+  const close=bars[n-1].c, prevClose=bars[n-2].c;
+  const high=bars[n-1].h, low=bars[n-1].l;
+  const vol=bars[n-1].v, prevVol=bars[n-2].v;
+  const kv=Math.min(20,n); let sv=0; for(let i=n-kv;i<n;i++) sv+=bars[i].v;
+  const volMA20 = sv/kv;
+  const kw=Math.min(252,n); let lo=Infinity,hi=-Infinity;
+  for(let i=n-kw;i<n;i++){ if(bars[i].l<lo)lo=bars[i].l; if(bars[i].h>hi)hi=bars[i].h; }
+  const i20=Math.max(0,n-21); const c20=bars[i20].c;
+  const perf20 = c20 ? close/c20-1 : 0;
+  const dollarVol = volMA20*close;
+  const chg = prevClose ? close/prevClose-1 : 0;
+  const rangePos = (hi>lo) ? clamp((close-lo)/(hi-lo),0,1) : 0.5;
+  return { close,prevClose,high,low,vol,prevVol,volMA20,low52:lo,high52:hi,
+           perf20,dollarVol,chg,green:close>prevClose,rangePos };
+}
+ 
+/* ---------------- indicateurs + score (spec §5–§7) ---------------- */
+function computeBloc(b){
+  const M=STATE.metrics;
+  const cells = lvl => (b[lvl]||[]).map(t=>({t,m:M[t]}));
+  const all1 = cells("N1"), all2 = cells("N2");
+  const n1 = all1.filter(x=>x.m), n2 = all2.filter(x=>x.m);
+  const n1Valid=n1.length, n2Valid=n2.length;
+ 
+  const base = { bloc:b, lit:false, ind2:false, tier:null, score:0,
+                 n1All:all1, n2All:all2,
+                 invalidN1: all1.length-n1Valid, invalidN2: all2.length-n2Valid,
+                 motorRatio:0, wagonRatio:0, greenN1:0, buyable:[], participation:0,
+                 posRange:0, perf20mean:0, volMult:0, groupVar:0,
+                 dormant:false, abnormal:false, n2conf:false, outperf:false };
+  if(n1Valid===0) return base;
+ 
+  // agrégats groupe N1 (calculés une fois)
+  const greenN1cells = n1.filter(x=>x.m.green);
+  const greenN1 = greenN1cells.length;
+  const sumVj  = n1.reduce((a,x)=>a+x.m.vol,0);
+  const sumVj1 = n1.reduce((a,x)=>a+x.m.prevVol,0);
+  const sumMA  = n1.reduce((a,x)=>a+x.m.volMA20,0);
+  const posRange   = n1.reduce((a,x)=>a+x.m.rangePos,0)/n1Valid;
+  const perf20mean = n1.reduce((a,x)=>a+x.m.perf20,0)/n1Valid;
+  const groupVar   = n1.reduce((a,x)=>a+x.m.chg,0)/n1Valid;
+  const volMult    = sumMA ? sumVj/sumMA : 0;
+  const greenN2    = n2.filter(x=>x.m.green).length;
+  const n2Ratio    = n2Valid ? greenN2/n2Valid : 0;
+ 
+  // --- Indicateur 1 : filet large (déclenchement sur le groupe N1) ---
+  const allGreen = greenN1===n1Valid;                 // 1. tous N1 verts
+  const ind1 = allGreen && sumVj>sumVj1;              // 2. volume total N1 en hausse
+  // filtres d'achat par action verte : vol indiv en hausse + liquidité
+  const buyable = greenN1cells.filter(x => x.m.vol>x.m.prevVol && x.m.dollarVol>CONFIG.LIQUIDITY_FLOOR);
+ 
+  // --- Indicateur 2 : pépite (tout l'ind1 + 4 conditions premium) ---
+  const dormant  = posRange < CONFIG.DORMANCY_RANGE_MAX && perf20mean < CONFIG.PERF20_MAX; // 5
+  const abnormal = volMult > CONFIG.ABNORMAL_VOL_MULT;                                     // 6
+  const n2conf   = n2Valid>0 && n2Ratio>0.5;                                               // 7
+  const outperf  = (groupVar - STATE.marketVar) > CONFIG.MARKET_OUTPERF_MARGIN;            // 8
+  const ind2 = ind1 && dormant && abnormal && n2conf && outperf;
+ 
+  // --- score 3 couches ---
+  const motorRatio = greenN1/n1Valid;
+  const wagonRatio = n2Ratio;
+  // couche 1+2 : moteurs, + wagons qui rattrapent les failles moteur
+  const eff = motorRatio + (1-motorRatio)*wagonRatio*CONFIG.WAGON_COMP;
+  let score = 100*eff;
+  // couche 3 (information — pondère, ne bloque pas)
+  score += clamp((volMult-1)*6, 0, 15);                                  // intensité volume
+  score += clamp((groupVar-STATE.marketVar)*300, 0, 10);                 // surperf marché
+  score += clamp((CONFIG.DORMANCY_RANGE_MAX-posRange)/CONFIG.DORMANCY_RANGE_MAX*8, 0, 8); // proximité bas 52s
+  const members=[...n1,...n2];
+  const participation = members.length ? members.filter(x=>x.m.green).length/members.length : 0;
+  score += clamp((participation-0.5)*14, 0, 7);                          // participation
+  score *= (CONFIG.PERT_MULT[b.pertinence] || 1.0);                      // qualité du bloc
+  score = Math.round(score);
+ 
+  let tier=null;
+  if(ind2) tier="ULTIME";
+  else if(ind1 && buyable.length>0 && score>=CONFIG.FORT_SCORE_MIN) tier="FORT";
+  else if(ind1) tier="VOL_OK";
+ 
+  return { ...base, lit:ind1, ind2, tier, score,
+           motorRatio, wagonRatio, greenN1, buyable:buyable.map(x=>x.t),
+           participation, posRange, perf20mean, volMult, groupVar,
+           dormant, abnormal, n2conf, outperf };
+}
+ 
+function computeAll(){
+  // métriques de tous les tickers
+  STATE.metrics={}; STATE.dead.clear();
+  for(const t of STATE.universe){
+    const m = computeMetrics(STATE.bars[t]);
+    if(m) STATE.metrics[t]=m; else STATE.dead.add(t);
+  }
+  // référence marché (surperformance)
+  const ref = STATE.metrics[MARKET_REF];
+  STATE.marketVar = ref ? ref.chg : 0;
+ 
+  // blocs
+  const res = STATE.blocs.map(computeBloc);
+  const rank = r => r.tier==="ULTIME"?3 : r.tier==="FORT"?2 : r.tier==="VOL_OK"?1 : 0;
+  res.sort((a,b)=> rank(b)-rank(a) || b.score-a.score);
+  STATE.results=res;
+ 
+  // notifications : nouveaux ultimes seulement
+  const nowUlt = new Set(res.filter(r=>r.ind2).map(r=>r.bloc.id));
+  const fresh = [...nowUlt].filter(id=>!STATE.lastUltimes.has(id));
+  if(fresh.length && $("tgAlert").classList.contains("on")) notifyUltime(fresh.length);
+  STATE.lastUltimes = nowUlt;
+ 
+  render();
+}
+ 
+/* ---------------- rendu ---------------- */
+function renderMacro(){
+  const el=$("macro"); el.innerHTML="";
+  for(const mk of MACRO){
+    const m=STATE.metrics[mk.t];
+    const card=document.createElement("div"); card.className="mcard";
+    const v = m ? m.close.toFixed(2) : "--";
+    const c = m ? fmtPct(m.chg) : "--";
+    card.innerHTML = `<div class="mk">${mk.label}</div>
+      <div class="mv">${v}</div>
+      <div class="mc ${m?cls(m.chg):''}">${c}</div>`;
+    el.appendChild(card);
   }
 }
  
-function toggleJournal() {
-  document.getElementById('journalBody').classList.toggle('open');
+function renderCounts(){
+  const r=STATE.results;
+  $("cUlt").textContent = r.filter(x=>x.tier==="ULTIME").length;
+  $("cFort").textContent= r.filter(x=>x.tier==="FORT").length;
+  $("cVol").textContent = r.filter(x=>x.tier==="VOL_OK").length;
+  $("cSec").textContent = STATE.blocs.length;
+  const ult=r.filter(x=>x.ind2);
+  const a=$("alert");
+  if(ult.length){ a.classList.add("show"); $("alertSub").textContent =
+    ult.length+" bloc"+(ult.length>1?"s":"")+" à profil ×10 : "+ult.slice(0,3).map(x=>x.bloc.nom).join(" · ")+(ult.length>3?" …":""); }
+  else a.classList.remove("show");
 }
  
-// ==================== FETCH DATA ====================
-async function fetchAllData() {
-  if (!API_KEY) return;
-  // loading disabled
- 
-  // Get all unique tickers
-  const allTickers = new Set();
-  SECTORS.forEach(s => s.tickers.forEach(t => allTickers.add(t)));
-  MACRO_TICKERS.forEach(t => allTickers.add(t));
- 
-  const tickerList = [...allTickers];
- 
-  try {
-    const chunks = chunkArray(tickerList, 15);
-    for (const chunk of chunks) {
-      await fetchSnapshot(chunk);
-      updateAllSectors();
-      updateMacro();
-      updateStats();
-    }
-  } catch(e) {
-    console.error(e);
-  }
-  showLoading(false);
+function memberRow(cell, isN1){
+  const t=cell.t, m=cell.m;
+  if(!m) return `<tr><td>${t}<span class="lvltag">${isN1?'N1':'N2'} · ✗</span></td><td colspan="4" class="flat">pas de données</td></tr>`;
+  const liq = m.dollarVol<CONFIG.LIQUIDITY_FLOOR
+      ? `<span class="noliq">${fmtUSD(m.dollarVol)} ⚠︎</span>` : fmtUSD(m.dollarVol);
+  const cap = STATE.capCache[t]!=null ? `<span class="capi">${fmtUSD(STATE.capCache[t])}</span>` : '<span class="flat">—</span>';
+  const rp = Math.round(m.rangePos*100);
+  return `<tr>
+    <td>${t}<span class="lvltag">${isN1?'N1':'N2'}</span></td>
+    <td class="${cls(m.chg)}">${fmtPct(m.chg)}</td>
+    <td>${liq}</td>
+    <td>${cap}</td>
+    <td><span class="rangebar"><i style="left:${clamp(rp,0,96)}%"></i></span> ${rp}%</td>
+  </tr>`;
 }
  
-async function fetchSnapshot(tickers) {
-  const symbols = tickers.join(',');
-  const url = `https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/tickers?tickers=${symbols}&apiKey=${API_KEY}`;
-  try {
-    const res = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${API_KEY}`
-      }
-    });
-    const data = await res.json();
-    if (data.tickers) {
-      data.tickers.forEach(t => {
-        tickerData[t.ticker] = {
-          price: t.day?.c || t.lastTrade?.p || 0,
-          prevClose: t.prevDay?.c || 0,
-          pct: t.todaysChangePerc || 0,
-          vol: t.day?.v || 0,
-          prevVol: t.prevDay?.v || 0,
-        };
-      });
-    }
-  } catch(e) {
-    console.error('Fetch error:', e);
-  }
-}
+function renderBloc(r, idx){
+  const b=r.bloc;
+  const div=document.createElement("div");
+  div.className="bloc"+(r.tier?(" t-"+r.tier):"")+(STATE.openIds.has(b.id)?" open":"");
+  div.dataset.id=b.id;
  
-// ==================== UPDATE SECTORS ====================
-function updateAllSectors() {
-  let ultimateCount = 0, partialCount = 0, volumeCount = 0;
-  let latestSignal = null;
- 
-  SECTORS.forEach((s, i) => {
-    const result = computeSector(s, i);
-    if (result.score === 100) { ultimateCount++; if (!latestSignal) latestSignal = {name: s.name, score: 100, sub: result.sub}; }
-    else if (result.score >= 70) partialCount++;
-    else if (result.score >= 40) volumeCount++;
-  });
- 
-  document.getElementById('st-ultimate').textContent = ultimateCount;
-  document.getElementById('st-partial').textContent = partialCount;
-  document.getElementById('st-volume').textContent = volumeCount;
- 
-  // Alert banner
-  if (latestSignal) {
-    document.getElementById('alertBanner').classList.add('visible');
-    document.getElementById('alertTitle').textContent = `🚨 SIGNAL ULTIME — ${latestSignal.name}`;
-    document.getElementById('alertSub').textContent = latestSignal.sub;
-    document.getElementById('alertTime').textContent = new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
-    playAlert();
-    logSignal(latestSignal.name, latestSignal.score, latestSignal.sub);
-  } else {
-    document.getElementById('alertBanner').classList.remove('visible');
-  }
-}
- 
-function computeSector(s, i) {
-  const tickers = s.tickers;
-  let allGreen = true;
-  let allVolOver = true;
-  let greenCount = 0;
-  let volOverCount = 0;
-  let totalVol = 0, totalPrevVol = 0;
-  let subParts = [];
- 
-  tickers.forEach(sym => {
-    const d = tickerData[sym];
-    if (!d) { allGreen = false; allVolOver = false; return; }
-    if (d.pct > 0) greenCount++;
-    else allGreen = false;
-    if (d.vol > d.prevVol && d.prevVol > 0) volOverCount++;
-    else allVolOver = false;
-    totalVol += d.vol;
-    totalPrevVol += d.prevVol;
-  });
- 
-  const totalVolOver = totalPrevVol > 0 && totalVol > totalPrevVol;
-  const volPct = totalPrevVol > 0 ? ((totalVol / totalPrevVol - 1) * 100) : 0;
- 
-  // Score calculation
-  let score = 0;
-  // 40pts: all tickers green
-  score += Math.round((greenCount / tickers.length) * 40);
-  // 40pts: each ticker volume > prev
-  score += Math.round((volOverCount / tickers.length) * 40);
-  // 20pts: total sector volume > prev
-  if (totalVolOver) score += 20;
- 
-  // Ultimate = 100
-  const isUltimate = score === 100;
-  const isPartial = score >= 70 && score < 100;
-  const isVolume = score >= 40 && score < 70;
- 
-  // Update card class
-  const card = document.getElementById(`card-${i}`);
-  card.className = 'sector-card' + (isUltimate ? ' signal-ultimate' : isPartial ? ' signal-partial' : isVolume ? ' signal-volume' : '');
- 
-  // Score circle
-  const scoreEl = document.getElementById(`score-${i}`);
-  const scoreClass = score === 0 ? 'score-0' : score < 40 ? 'score-low' : score < 70 ? 'score-mid' : score < 100 ? 'score-high' : 'score-max';
-  scoreEl.className = `score-circle ${scoreClass}`;
-  scoreEl.innerHTML = `<div class="score-val">${score === 0 && Object.keys(tickerData).length === 0 ? '--' : score}</div><div class="score-label">SCORE</div>`;
- 
-  // Badges
-  const badgesEl = document.getElementById(`badges-${i}`);
-  let badgesHTML = '';
-  if (isUltimate) badgesHTML = '<div class="badge badge-green">🚨 ULTIME</div>';
-  else {
-    if (allGreen) badgesHTML += '<div class="badge badge-green">✅ TOUT VERT</div>';
-    else badgesHTML += `<div class="badge badge-muted">${greenCount}/${tickers.length} VERT</div>`;
-    if (totalVolOver) badgesHTML += `<div class="badge badge-blue">VOL +${volPct.toFixed(0)}%</div>`;
-  }
-  if (!badgesHTML) badgesHTML = '<div class="badge badge-muted">En attente</div>';
-  badgesEl.innerHTML = badgesHTML;
- 
-  // Meta
-  document.getElementById(`meta-${i}`).textContent = `${tickers.length} tickers · Score ${score}/100`;
- 
-  // Ticker grid
-  const tickerGrid = document.getElementById(`tickers-${i}`);
-  tickerGrid.innerHTML = '';
-  tickers.forEach(sym => {
-    const d = tickerData[sym];
-    if (!d) {
-      tickerGrid.innerHTML += `<div class="ticker-item"><div class="ticker-sym">${sym}</div><div class="ticker-pct flat">--</div><div class="ticker-vol">--</div></div>`;
-      return;
-    }
-    const isUlt = d.pct > 0 && d.vol > d.prevVol;
-    const volRatio = d.prevVol > 0 ? ((d.vol / d.prevVol - 1) * 100) : 0;
-    tickerGrid.innerHTML += `
-      <div class="ticker-item ${isUlt ? 'ultimate' : ''}">
-        <div class="ticker-sym">${sym}</div>
-        <div class="ticker-pct ${d.pct > 0 ? 'up' : d.pct < 0 ? 'down' : 'flat'}">${d.pct > 0 ? '+' : ''}${d.pct.toFixed(2)}%</div>
-        <div class="ticker-vol ${d.vol > d.prevVol ? 'over' : 'under'}">VOL ${d.vol > d.prevVol ? '↑' : '↓'} ${volRatio > 0 ? '+' : ''}${volRatio.toFixed(0)}%</div>
-      </div>`;
-  });
- 
-  // Volume bar
-  const barWidth = Math.min(totalPrevVol > 0 ? (totalVol / totalPrevVol) * 60 : 0, 100);
-  const barEl = document.getElementById(`vol-bar-${i}`);
-  barEl.style.width = barWidth + '%';
-  barEl.className = `vol-fill ${totalVolOver ? 'over' : barWidth > 40 ? 'partial' : 'under'}`;
-  document.getElementById(`vol-pct-${i}`).textContent = totalPrevVol > 0 ? `${volPct > 0 ? '+' : ''}${volPct.toFixed(0)}% vs veille` : '--';
-  document.getElementById(`vol-pct-${i}`).style.color = totalVolOver ? 'var(--green)' : volPct > 0 ? 'var(--yellow)' : 'var(--muted)';
- 
-  return { score, sub: `${greenCount}/${tickers.length} vert · Vol ${volPct > 0 ? '+' : ''}${volPct.toFixed(0)}%` };
-}
- 
-// ==================== MACRO ====================
-function updateMacro() {
-  const macroMap = { SPY: ['m-spy','mc-spy'], QQQ: ['m-qqq','mc-qqq'], GLD: ['m-gld','mc-gld'] };
-  Object.entries(macroMap).forEach(([sym, [priceId, chgId]]) => {
-    const d = tickerData[sym];
-    if (!d) return;
-    document.getElementById(priceId).textContent = d.price > 0 ? d.price.toFixed(2) : '--';
-    const chgEl = document.getElementById(chgId);
-    chgEl.textContent = `${d.pct > 0 ? '+' : ''}${d.pct.toFixed(2)}%`;
-    chgEl.className = `macro-chg ${d.pct > 0 ? 'up' : 'down'}`;
-  });
-}
- 
-function updateStats() {
-  document.getElementById('st-total').textContent = SECTORS.length;
-}
- 
-// ==================== JOURNAL ====================
-function logSignal(sector, score, sub) {
-  const now = new Date();
-  const entry = {
-    time: now.toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit',second:'2-digit'}),
-    date: now.toLocaleDateString('fr-FR'),
-    sector, score, sub
+  // chips N1 (verts / achetables / morts), puis N2 confirmant
+  const chip = (cell,isN1)=>{
+    const t=cell.t, m=cell.m;
+    if(!m) return `<span class="tk dead">${t}</span>`;
+    let c="tk";
+    if(isN1){ if(r.buyable.includes(t)) c="tk buy"; else if(m.green) c="tk g"; }
+    else if(m.green) c="tk g";
+    return `<span class="${c}">${t}<span class="lvl">${isN1?'':'·N2'}</span></span>`;
   };
+  const n1chips = r.n1All.map(c=>chip(c,true)).join("");
+  const n2chips = r.n2All.filter(c=>c.m&&c.m.green).map(c=>chip(c,false)).join("");
  
-  // Avoid duplicate within 5 min
-  const last = JOURNAL[JOURNAL.length - 1];
-  if (last && last.sector === sector && (now - new Date()) < 300000) return;
+  const tierLbl = r.tier==="VOL_OK"?"VOL OK":r.tier;
+  const sub = r.lit
+    ? `${r.greenN1}/${r.n1All.filter(c=>c.m).length} moteurs · ${r.buyable.length} achetable${r.buyable.length>1?'s':''} · vol ×${r.volMult.toFixed(1)} · part ${Math.round(r.participation*100)}%`
+    : `${r.greenN1}/${r.n1All.filter(c=>c.m).length} moteurs verts — pas de déclenchement`;
  
-  JOURNAL.push(entry);
-  renderJournal();
-}
+  const cnd = c => `<span class="cb ${c.ok?'ok':'no'}">${c.ok?'✓':'·'} ${c.l}</span>`;
+  const conds = [
+    {l:"dormance", ok:r.dormant},
+    {l:"vol anormal", ok:r.abnormal},
+    {l:"N2 confirme", ok:r.n2conf},
+    {l:"bat marché", ok:r.outperf},
+  ].map(cnd).join("");
  
-function renderJournal() {
-  const body = document.getElementById('journalBody');
-  const empty = document.getElementById('emptyJournal');
-  document.getElementById('journalCount').textContent = `${JOURNAL.length} signal${JOURNAL.length > 1 ? 's' : ''}`;
+  const rowsN1 = r.n1All.map(c=>memberRow(c,true)).join("");
+  const rowsN2 = r.n2All.map(c=>memberRow(c,false)).join("");
  
-  if (JOURNAL.length === 0) {
-    empty.style.display = 'block';
-    return;
-  }
-  empty.style.display = 'none';
- 
-  const entries = [...JOURNAL].reverse().slice(0, 20);
-  body.innerHTML = entries.map(e => `
-    <div class="journal-entry">
-      <span class="je-time">${e.date} ${e.time}</span>
-      <span class="je-sector">${e.sector}</span>
-      <span class="je-score">${e.score}/100</span>
-      <span style="color:var(--muted)">${e.sub}</span>
+  div.innerHTML = `
+    <div class="bhead">
+      <div class="brank">${idx+1}</div>
+      <div class="bmain">
+        <div class="bname"><span class="pert ${b.pertinence}">${b.pertinence}</span><span class="nm">${b.nom}</span></div>
+        <div class="bsub">${sub}</div>
+      </div>
+      ${r.tier?`<span class="tier ${r.tier}">${tierLbl}</span>`:''}
+      <div class="score">${r.lit?r.score:'·'}</div>
+      <div class="chev">▶</div>
     </div>
-  `).join('') + '<div id="emptyJournal" style="display:none"></div>';
+    ${ (n1chips||n2chips) ? `<div class="chips-row">${n1chips}${n2chips}</div>` : '' }
+    <div class="detail">
+      <div class="cond">${conds}</div>
+      <table class="mtbl">
+        <thead><tr><th>Ticker</th><th>Jour</th><th>Liquidité</th><th>Capi</th><th>Pos. 52s</th></tr></thead>
+        <tbody>${rowsN1}${rowsN2}</tbody>
+      </table>
+    </div>`;
+ 
+  const head=div.querySelector(".bhead");
+  head.addEventListener("click", ()=>{
+    if(STATE.openIds.has(b.id)){ STATE.openIds.delete(b.id); div.classList.remove("open"); }
+    else { STATE.openIds.add(b.id); div.classList.add("open"); loadCaps(r); }
+  });
+  return div;
 }
  
-// ==================== REFRESH TIMER ====================
-function startRefreshTimer() {
-  if (refreshInterval) clearInterval(refreshInterval);
-  if (countdownInterval) clearInterval(countdownInterval);
+function passFilter(r){
+  if(STATE.litOnly && !r.lit) return false;
+  if(STATE.filterPert!=="all" && r.bloc.pertinence!==STATE.filterPert) return false;
+  if(STATE.search){
+    const q=STATE.search;
+    const hay=(r.bloc.nom+" "+r.n1All.map(c=>c.t).join(" ")+" "+r.n2All.map(c=>c.t).join(" ")).toLowerCase();
+    if(!hay.includes(q)) return false;
+  }
+  return true;
+}
  
-  refreshSeconds = 60;
-  updateCountdown();
+function render(){
+  renderMacro();
+  renderCounts();
+  const list=$("list"); list.innerHTML="";
+  const shown=STATE.results.filter(passFilter);
+  if(!shown.length){
+    list.innerHTML = `<div class="empty">${STATE.results.length?
+      "<b>Aucun bloc</b> ne correspond au filtre.<br>Décoche « Allumés seuls » pour tout voir.":
+      "<b>Rien encore.</b><br>Connecte ta clé Polygon puis lance le scan."}</div>`;
+  } else {
+    shown.forEach((r,i)=>list.appendChild(renderBloc(r,i)));
+  }
+  // liste de nettoyage
+  const dead=[...STATE.dead].filter(t=>!MACRO.find(m=>m.t===t)).sort();
+  const box=$("cleanBox");
+  if(dead.length){
+    box.style.display="";
+    $("cleanSum").textContent = `⚠︎ ${dead.length} ticker${dead.length>1?'s':''} invalide${dead.length>1?'s':''} (à corriger)`;
+    $("deadlist").innerHTML = dead.map(t=>`<span class="tk dead">${t}</span>`).join("");
+  } else box.style.display="none";
+}
  
-  countdownInterval = setInterval(() => {
-    refreshSeconds--;
-    updateCountdown();
-    if (refreshSeconds <= 0) {
-      refreshSeconds = 60;
-      fetchAllData();
+/* ---------------- capitalisation (à la demande, par bloc ouvert) ---------------- */
+async function loadCaps(r){
+  const tickers = [...r.n1All, ...r.n2All].map(c=>c.t)
+    .filter(t=>STATE.metrics[t] && STATE.capCache[t]===undefined);
+  if(!tickers.length) return;
+  for(const t of tickers) STATE.capCache[t]=null;  // marque "en cours" (évite double fetch)
+  for(const t of tickers){
+    try{
+      const j=await poly(`/v3/reference/tickers/${encodeURIComponent(t)}`);
+      STATE.capCache[t] = (j&&j.results&&j.results.market_cap)||null;
+    }catch(e){ STATE.capCache[t]=null; }
+  }
+  // re-render (l'état déplié est conservé via STATE.openIds)
+  render();
+}
+ 
+/* ---------------- scans ---------------- */
+async function fullScan(){
+  if(STATE.scanning) return;
+  if(!getKey()){ toast("Saisis ta clé Polygon d'abord"); return; }
+  STATE.scanning=true; setStatus("scan…", false);
+  $("rescanBtn").disabled=true;
+  const prog=$("prog"); prog.classList.add("show");
+  const total=STATE.universe.length; let done=0;
+  $("pfill").style.width="0%"; $("ptxt").textContent=`0 / ${total} tickers`;
+ 
+  let authFailed=false;
+  await pool(STATE.universe, async (t)=>{
+    try{ STATE.bars[t] = await fetchAggs(t); }
+    catch(e){ if(String(e.message).includes("clé")) authFailed=true; STATE.bars[t]=STATE.bars[t]||[]; }
+    done++;
+    if(done%5===0 || done===total){
+      $("pfill").style.width=(done/total*100)+"%";
+      $("ptxt").textContent=`${done} / ${total} tickers`;
     }
-  }, 1000);
+  }, CONFIG.CONCURRENCY);
+ 
+  prog.classList.remove("show");
+  STATE.scanning=false; $("rescanBtn").disabled=false;
+  if(authFailed){ setStatus("clé refusée", false); toast("Clé Polygon refusée — vérifie-la"); return; }
+  computeAll();
+  setStatus("en ligne", true);
+  stampMaj();
+  if($("tgAuto").classList.contains("on")) startAuto();
 }
  
-function updateCountdown() {
-  document.getElementById('refreshTimer').textContent = refreshSeconds + 's';
-  const pct = (refreshSeconds / 60) * 100;
-  document.getElementById('refreshFill').style.width = pct + '%';
+// refresh léger : 1 seul appel (grouped daily) → maj de la dernière barre
+async function lightRefresh(){
+  if(STATE.scanning) return;
+  if(!getKey() || !Object.keys(STATE.bars).length) return;
+  STATE.scanning=true; setStatus("maj…", true);
+  try{
+    let map=null, used=null;
+    for(let back=0; back<6; back++){                // dernière séance avec données
+      const d=new Date(Date.now()-back*864e5);
+      const day=d.getDay(); if(day===0||day===6) continue;   // week-end
+      const m=await fetchGroupedDay(ymd(d));
+      if(Object.keys(m).length>50){ map=m; used=ymd(d); break; }
+    }
+    if(!map){ STATE.scanning=false; setStatus("en ligne",true); return; }
+    // fusionne la barre du jour dans chaque série suivie
+    for(const t of STATE.universe){
+      const b=map[t]; if(!b) continue;
+      const series=STATE.bars[t]; if(!series||!series.length) continue;
+      const last=series[series.length-1];
+      const lastDay=ymd(new Date(last.t)); 
+      const bar={t:b.t,o:b.o,h:b.h,l:b.l,c:b.c,v:b.v};
+      if(used===lastDay) series[series.length-1]=bar;   // même séance → remplace
+      else series.push(bar);                            // nouvelle séance → ajoute
+    }
+    STATE.scanning=false;
+    computeAll();
+    setStatus("en ligne", true); stampMaj();
+  }catch(e){
+    STATE.scanning=false; setStatus("en ligne", true);
+    // si le grouped échoue, on reste sur les dernières données ; rescan complet possible à la main
+  }
 }
  
-// ==================== UTILS ====================
-function chunkArray(arr, size) {
-  const chunks = [];
-  for (let i = 0; i < arr.length; i += size) chunks.push(arr.slice(i, i + size));
-  return chunks;
+// pool de concurrence
+async function pool(items, worker, size){
+  let i=0;
+  const runners=Array.from({length:Math.min(size,items.length)}, async ()=>{
+    while(i<items.length){ const idx=i++; await worker(items[idx], idx); }
+  });
+  await Promise.all(runners);
 }
  
-function showLoading(show, text = '') {
-  const el = document.getElementById('loadingOverlay');
-  el.style.display = show ? 'flex' : 'none';
-  if (text) document.getElementById('loadingText').textContent = text;
+/* ---------------- alertes ---------------- */
+function notifyUltime(n){
+  beep();
+  try{
+    if("Notification" in window && Notification.permission==="granted"){
+      new Notification("🚨 SIGNAL ULTIME", { body:n+" bloc"+(n>1?"s":"")+" à profil ×10 détecté"+(n>1?"s":"") });
+    }
+  }catch(e){}
+  toast("🚨 "+n+" signal ULTIME");
+}
+function beep(){
+  try{
+    if(!STATE.audioCtx) STATE.audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    const a=STATE.audioCtx, o=a.createOscillator(), g=a.createGain();
+    o.type="sine"; o.frequency.value=880; o.connect(g); g.connect(a.destination);
+    g.gain.setValueAtTime(.001,a.currentTime);
+    g.gain.exponentialRampToValueAtTime(.25,a.currentTime+.03);
+    g.gain.exponentialRampToValueAtTime(.001,a.currentTime+.5);
+    o.start(); o.stop(a.currentTime+.5);
+  }catch(e){}
 }
  
-function playAlert() {
-  try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    [880, 1100, 1320].forEach((freq, i) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.frequency.value = freq;
-      osc.type = 'sine';
-      gain.gain.setValueAtTime(0.3, ctx.currentTime + i * 0.15);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.15 + 0.3);
-      osc.start(ctx.currentTime + i * 0.15);
-      osc.stop(ctx.currentTime + i * 0.15 + 0.3);
-    });
-  } catch(e) {}
+/* ---------------- statut / auto ---------------- */
+function setStatus(txt, on){ $("statusTxt").textContent=txt; $("pulse").classList.toggle("on",!!on); }
+function stampMaj(){ const d=new Date(); $("lastMaj").textContent="MAJ "+d.toLocaleTimeString("fr-FR"); }
+function startAuto(){ stopAuto(); STATE.autoTimer=setInterval(lightRefresh, CONFIG.REFRESH_SECONDS*1000); }
+function stopAuto(){ if(STATE.autoTimer){ clearInterval(STATE.autoTimer); STATE.autoTimer=null; } }
+ 
+/* ---------------- chargement bibliothèque ---------------- */
+async function loadBlocs(){
+  try{
+    const r=await fetch("./blocs.json",{cache:"no-store"});
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    const j=await r.json();
+    STATE.blocs = j.blocs || j;
+  }catch(e){
+    $("list").innerHTML = `<div class="empty"><b>blocs.json introuvable.</b><br>
+      Place <code>blocs.json</code> à côté de <code>index.html</code> (GitHub Pages le sert automatiquement).<br>
+      En local : lance un petit serveur (<code>python -m http.server</code>) — le <code>file://</code> bloque le fetch.</div>`;
+    throw e;
+  }
+  // univers = tickers uniques de la biblio + instruments macro
+  const set=new Set();
+  for(const b of STATE.blocs) for(const lvl of ["N1","N2","N3"]) (b[lvl]||[]).forEach(t=>set.add(t));
+  MACRO.forEach(m=>set.add(m.t));
+  STATE.universe=[...set];
+  $("cSec").textContent=STATE.blocs.length;
 }
  
-// Update market status every minute
-setInterval(updateMarketStatus, 60000);
+/* ---------------- UI wiring ---------------- */
+function wire(){
+  // clé
+  const saved=getKey(); if(saved) $("keyInput").value=saved;
+  $("connectBtn").addEventListener("click", ()=>{
+    const k=$("keyInput").value.trim();
+    if(!k || k===CONFIG.KEY_PLACEHOLDER){ toast("Colle ta vraie clé Polygon"); return; }
+    setKey(k); $("rescanBtn").disabled=false;
+    fullScan();
+  });
+  $("rescanBtn").addEventListener("click", fullScan);
+ 
+  // filtres pertinence
+  $("pertChips").addEventListener("click", e=>{
+    const c=e.target.closest(".chip"); if(!c) return;
+    document.querySelectorAll("#pertChips .chip").forEach(x=>x.classList.remove("on"));
+    c.classList.add("on"); STATE.filterPert=c.dataset.p; render();
+  });
+  // recherche
+  let st=null;
+  $("search").addEventListener("input", e=>{
+    clearTimeout(st); const v=e.target.value.toLowerCase().trim();
+    st=setTimeout(()=>{ STATE.search=v; render(); },180);
+  });
+  // toggles
+  $("tgLit").addEventListener("click", ()=>{ const t=$("tgLit"); t.classList.toggle("on"); STATE.litOnly=t.classList.contains("on"); render(); });
+  $("tgAuto").addEventListener("click", ()=>{
+    const t=$("tgAuto"); t.classList.toggle("on");
+    if(t.classList.contains("on")){ startAuto(); if(Object.keys(STATE.bars).length) lightRefresh(); }
+    else stopAuto();
+  });
+  $("tgAlert").addEventListener("click", ()=>{
+    const t=$("tgAlert"); t.classList.toggle("on");
+    if(t.classList.contains("on")){
+      try{ if("Notification" in window && Notification.permission==="default") Notification.requestPermission(); }catch(e){}
+      try{ if(!STATE.audioCtx) STATE.audioCtx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){}
+    }
+  });
+  document.addEventListener("visibilitychange", ()=>{ if(!document.hidden && $("tgAuto").classList.contains("on")) lightRefresh(); });
+}
+ 
+/* ---------------- init ---------------- */
+(async function init(){
+  wire();
+  try{ await loadBlocs(); }catch(e){ return; }
+  render();
+  if(getKey()){ $("rescanBtn").disabled=false; fullScan(); }
+  else toast("Colle ta clé Polygon puis « Connecter »");
+})();
+ 
+/* ============================================================
+   NOTES (pas du code)
+   - Clé : jamais en dur dans un repo public. Ici saisie au runtime
+     (mémorisée via localStorage côté navigateur). Pour la mettre en
+     dur en local : remplace CONFIG.KEY_PLACEHOLDER.
+   - Bandeau marché : proxies ETF/actions (SPY/QQQ/DIA/GLD/IBIT/VIXY),
+     tous dans le feed Stocks Starter. Si ton abo couvre les indices /
+     la crypto, remplace dans MACRO par I:VIX, X:BTCUSD, etc. (et adapte
+     l'endpoint dans fetchAggs si besoin).
+   - Refresh léger = 1 appel grouped-daily/jour pour tout le marché ;
+     le rescan complet recharge l'historique de chaque ticker.
+   - Capi chargée à la demande (ouverture d'un bloc) pour garder le scan
+     rapide. Drapeau détresse (reverse split / dilution) : non implémenté
+     v1 — nécessite /v3/reference/splits, à ajouter de la même façon.
+   - Seuils §12 = points de départ. À affiner dans CONFIG, pas à sur-optimiser.
+   ============================================================ */
 </script>
 </body>
 </html>
