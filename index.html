@@ -13,7 +13,7 @@
   --border:#1d2740; --border2:#2a3656;
   --text:#e9edf6; --muted:#8b95ad; --faint:#5a6379;
   --green:#3fd07f; --red:#ff5d6c; --amber:#ff9f2e; --yellow:#ffd84d;
-  --ultime:#b794ff; --ultime2:#8b5cf6; --blue:#4c8dff;
+  --ultime:#b794ff; --ultime2:#8b5cf6; --blue:#4c8dff; --sky:#38bdf8;
   --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,monospace;
   --sans:'Archivo',system-ui,-apple-system,sans-serif;
 }
@@ -153,10 +153,11 @@ header{
 .proxbar{width:46px;height:5px;border-radius:3px;background:var(--border2);overflow:hidden}
 .proxbar i{display:block;height:100%;border-radius:3px;transition:width .35s}
 .proxlbl{font-family:var(--mono);font-size:9px;color:var(--faint);line-height:1}
-.gauge{position:relative;width:44px;height:44px;flex:0 0 auto}
+.gauge{position:relative;width:48px;height:48px;flex:0 0 auto}
 .gauge .ring{width:100%;height:100%;border-radius:50%;background:conic-gradient(var(--gc) var(--deg), var(--border2) 0);transition:background .35s}
+.gauge.glow .ring{box-shadow:0 0 13px -2px var(--gc)}
 .gauge .hole{position:absolute;inset:5px;border-radius:50%;background:var(--bg2);display:grid;place-items:center}
-.gauge .num{font-family:var(--mono);font-size:13px;font-weight:700;line-height:1;color:var(--text)}
+.gauge .num{font-family:var(--mono);font-size:15px;font-weight:700;line-height:1;color:var(--gc)}
 .chev{color:var(--faint);font-size:12px;transition:transform .2s;flex:0 0 auto}
 .bloc.open .chev{transform:rotate(90deg)}
  
@@ -193,6 +194,8 @@ header{
 .rangebar{display:inline-block;width:46px;height:5px;border-radius:3px;background:var(--border2);position:relative;vertical-align:middle}
 .rangebar i{position:absolute;top:-1.5px;width:3px;height:8px;border-radius:2px;background:var(--blue)}
 .capi{color:var(--muted)}
+.vmult{font-weight:700}
+.vmult.up{color:var(--green)} .vmult.dn{color:var(--red)} .vmult.hot{color:var(--amber)}
 .vraw{display:block;font-size:8.5px;color:var(--faint);font-weight:400;margin-top:1px}
  
 .empty{text-align:center;color:var(--muted);padding:40px 16px;font-size:13px}
@@ -579,8 +582,8 @@ function memberRow(cell, isN1){
       ? `<span class="noliq">${fmtUSD(m.dollarVol)} ⚠︎</span>` : fmtUSD(m.dollarVol);
   const rp = Math.round(m.rangePos*100);
   const vr = m.volMA20 ? m.vol/m.volMA20 : 0;          // volume du jour vs moyenne 20j
-  const vUp = m.vol>m.prevVol;                          // vs veille
-  const vcls = (vr>=CONFIG.ABNORMAL_VOL_MULT||vUp) ? 'up' : 'dn';
+  const vUp = m.vol>m.prevVol;                          // maintenant vs hier
+  const vcls = vr>=CONFIG.ABNORMAL_VOL_MULT ? 'hot' : (vUp ? 'up' : 'dn');
   const cv = STATE.capCache[t];
   const cap = (typeof cv==="number" && cv>0)
       ? `<span class="${cv<CONFIG.SMALLCAP_MAX?'up':'flat'}">${fmtUSD(cv)}</span>`   // petit = vert (potentiel ×10)
@@ -588,7 +591,7 @@ function memberRow(cell, isN1){
   return `<tr>
     <td>${t}<span class="lvltag">${isN1?'N1':'N2'}</span></td>
     <td class="${cls(m.chg)}">${fmtPct(m.chg)}</td>
-    <td class="${vcls}">×${vr.toFixed(1)} ${vUp?'↑':'↓'}<span class="vraw">${fmtNum(m.vol)}</span></td>
+    <td><span class="vmult ${vcls}">×${vr.toFixed(1)} ${vUp?'↑':'↓'}</span><span class="vraw">${fmtNum(m.prevVol)} → ${fmtNum(m.vol)}</span></td>
     <td>${liq}</td>
     <td>${cap}</td>
     <td><span class="rangebar"><i style="left:${clamp(rp,0,96)}%"></i></span> ${rp}%</td>
@@ -604,10 +607,11 @@ function renderBloc(r, idx){
   // jauge de score (pastille ronde) — visible sans ouvrir : 0 → ~200 (175+ = ultime)
   const n1Valid = r.n1All.filter(c=>c.m).length;
   const gaugeDeg = clamp(r.score/200*360, 0, 360);
-  let gaugeColor = "var(--faint)";
-  if(r.tier==="ULTIME") gaugeColor="var(--ultime2)";
-  else if(r.tier==="FORT") gaugeColor="var(--amber)";
-  else if(r.tier==="VOL_OK") gaugeColor="var(--yellow)";
+  let gaugeColor;
+  if(r.score>=CONFIG.ULTIME_MIN) gaugeColor="var(--ultime)";
+  else if(r.score>=CONFIG.FORT_MIN) gaugeColor="var(--amber)";
+  else if(r.score>=CONFIG.LIT_MIN) gaugeColor="var(--yellow)";
+  else gaugeColor="var(--sky)";   // tiède : cyan vivant (pas gris triste)
  
   // chips — N1 (purs) et N2 (confirment) affichés dans DEUX zones séparées
   const chip = (cell,isN1)=>{
@@ -630,10 +634,13 @@ function renderBloc(r, idx){
  
   const cnd = c => `<span class="cb ${c.ok?'ok':'no'}">${c.ok?'✓':'·'} ${c.l}</span>`;
   const lowCalm = r.posRange<CONFIG.DORMANCY_RANGE_MAX && r.perf20mean<CONFIG.PERF20_MAX;
+  const indivN = Math.round(r.indivPart * n1Valid);
   const conds = [
+    {l:"vol total ↑", ok:r.volUp},
+    {l:`vol unitaire ${indivN}/${n1Valid}`, ok:n1Valid>0 && indivN>=n1Valid},
+    {l:"vol anormal ×2-3", ok:r.abnormal},
     {l:"petite capi", ok:r.smallCap},
     {l:"bas 52s + calme", ok:lowCalm},
-    {l:"vol anormal ×2-3", ok:r.abnormal},
     {l:"N2 confirme", ok:r.n2conf},
     {l:"bat marché", ok:r.outperf},
   ].map(cnd).join("");
@@ -649,7 +656,7 @@ function renderBloc(r, idx){
         <div class="bsub">${sub}</div>
       </div>
       ${r.tier?`<span class="tier ${r.tier}">${tierLbl}</span>`:''}
-      <div class="gauge" title="score ${r.score} / 200"><div class="ring" style="--deg:${gaugeDeg};--gc:${gaugeColor}"></div><div class="hole"><span class="num">${r.score}</span></div></div>
+      <div class="gauge${r.score>=CONFIG.PREMIUM_MIN?' glow':''}" style="--deg:${gaugeDeg}deg;--gc:${gaugeColor}" title="score ${r.score} / 200"><div class="ring"></div><div class="hole"><span class="num">${r.score}</span></div></div>
       <div class="chev">▶</div>
     </div>
     <div class="zones">
@@ -659,7 +666,7 @@ function renderBloc(r, idx){
     <div class="detail">
       <div class="cond">${conds}</div>
       <div class="mwrap"><table class="mtbl">
-        <thead><tr><th>Ticker</th><th>Jour</th><th>Vol ×MA20</th><th>Liquidité</th><th>Capi</th><th>Pos. 52s</th></tr></thead>
+        <thead><tr><th>Ticker</th><th>Jour</th><th>Volume (hier→auj.)</th><th>Liquidité</th><th>Capi</th><th>Pos. 52s</th></tr></thead>
         <tbody>${rowsN1}${rowsN2}</tbody>
       </table></div>
     </div>`;
