@@ -126,6 +126,8 @@ header{
 }
 .bloc.t-ULTIME{border-color:var(--ultime2);background:linear-gradient(180deg,rgba(139,92,246,.10),var(--panel) 55%)}
 .bloc.t-FORT{border-color:rgba(255,159,46,.4)}
+.bloc.premium{box-shadow:inset 3px 0 0 rgba(255,159,46,.75)}
+.bloc.t-ULTIME.premium{box-shadow:inset 3px 0 0 var(--ultime2)}
 .bhead{display:flex;align-items:center;gap:10px;padding:12px 13px;cursor:pointer}
 .brank{font-family:var(--mono);font-size:11px;color:var(--faint);width:20px;text-align:right;flex:0 0 auto}
 .bmain{flex:1;min-width:0}
@@ -136,13 +138,36 @@ header{
 .pert.B{background:rgba(255,159,46,.18);color:var(--amber)}
 .pert.C{background:rgba(139,149,173,.16);color:var(--muted)}
 .bsub{font-size:11px;color:var(--muted);margin-top:3px;font-family:var(--mono)}
+.volb{display:inline-block;font-family:var(--mono);font-weight:700;font-size:10.5px;padding:1px 6px;border-radius:5px;border:1px solid var(--border2)}
+.volb.up{color:var(--green);border-color:rgba(63,208,127,.4);background:rgba(63,208,127,.08)}
+.volb.hot{color:var(--amber);border-color:rgba(255,159,46,.55);background:rgba(255,159,46,.14)}
+.volb.dn{color:var(--red);border-color:rgba(255,93,108,.35);background:rgba(255,93,108,.07)}
+.mwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.mtbl{min-width:430px}
 .tier{font-family:var(--sans);font-size:10px;font-weight:800;letter-spacing:.04em;padding:4px 9px;border-radius:7px;flex:0 0 auto}
 .tier.ULTIME{background:var(--ultime2);color:#fff}
 .tier.FORT{background:rgba(255,159,46,.18);color:var(--amber);border:1px solid rgba(255,159,46,.4)}
 .tier.VOL_OK{background:rgba(255,216,77,.14);color:var(--yellow);border:1px solid rgba(255,216,77,.32)}
-.score{font-family:var(--mono);font-size:20px;font-weight:700;flex:0 0 auto;text-align:right;min-width:42px}
+.scorebox{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:46px}
+.score{font-family:var(--mono);font-size:20px;font-weight:700;text-align:right;line-height:1}
+.proxbar{width:46px;height:5px;border-radius:3px;background:var(--border2);overflow:hidden}
+.proxbar i{display:block;height:100%;border-radius:3px;transition:width .35s}
+.proxlbl{font-family:var(--mono);font-size:9px;color:var(--faint);line-height:1}
+.gauge{position:relative;width:44px;height:44px;flex:0 0 auto}
+.gauge .ring{width:100%;height:100%;border-radius:50%;background:conic-gradient(var(--gc) var(--deg), var(--border2) 0);transition:background .35s}
+.gauge .hole{position:absolute;inset:5px;border-radius:50%;background:var(--bg2);display:grid;place-items:center}
+.gauge .num{font-family:var(--mono);font-size:13px;font-weight:700;line-height:1;color:var(--text)}
 .chev{color:var(--faint);font-size:12px;transition:transform .2s;flex:0 0 auto}
 .bloc.open .chev{transform:rotate(90deg)}
+ 
+.zones{padding:2px 13px 12px}
+.zone{margin-top:9px}
+.zone:first-child{margin-top:2px}
+.zlbl{font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--faint);margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.zlbl .zc{font-family:var(--mono);color:var(--muted)}
+.n2zone{border-top:1px dashed var(--border);padding-top:9px}
+.zones .chips-row{padding:0}
+.znone{color:var(--faint);font-size:11px}
  
 .chips-row{display:flex;flex-wrap:wrap;gap:5px;padding:0 13px 12px}
 .tk{font-family:var(--mono);font-size:11px;font-weight:500;padding:3px 8px;border-radius:7px;border:1px solid var(--border2);background:var(--bg2);color:var(--muted);display:inline-flex;align-items:center;gap:5px}
@@ -168,6 +193,7 @@ header{
 .rangebar{display:inline-block;width:46px;height:5px;border-radius:3px;background:var(--border2);position:relative;vertical-align:middle}
 .rangebar i{position:absolute;top:-1.5px;width:3px;height:8px;border-radius:2px;background:var(--blue)}
 .capi{color:var(--muted)}
+.vraw{display:block;font-size:8.5px;color:var(--faint);font-weight:400;margin-top:1px}
  
 .empty{text-align:center;color:var(--muted);padding:40px 16px;font-size:13px}
 .empty b{color:var(--text)}
@@ -277,13 +303,15 @@ const CONFIG = {
   LIQUIDITY_FLOOR: 1_000_000,    // dollarVol min pour sortir de la zone morte
   DORMANCY_RANGE_MAX: 0.35,      // (close-bas52) / (haut52-bas52) <  → secteur encore bas
   PERF20_MAX: 0.40,              // perf 20j <  → pas déjà parti
-  ABNORMAL_VOL_MULT: 2.5,        // vol[j] groupe > x × volMA20 groupe  → afflux anormal
+  ABNORMAL_VOL_MULT: 2.5,        // vol[j] groupe > x × volMA20 groupe  → afflux "anormal" (bonus, PAS un filtre)
   MARKET_OUTPERF_MARGIN: 0.0,    // var(groupe N1) - var(SPY) >  → bat l'indice
+  SMALLCAP_MAX: 12_000_000_000,  // capi médiane N1 <  → "petite" (potentiel ×10). Géant bas ≠ pépite (spec §6.5)
  
-  // ---- score / tri ----
-  WAGON_COMP: 0.7,               // capacité des wagons (N2) à rattraper les failles moteur (N1)
-  PERT_MULT: { A: 1.12, B: 1.05, C: 1.0 },  // à signal égal, A passe devant C
-  FORT_SCORE_MIN: 60,            // Indicateur 1 + score ≥ ce seuil → tier FORT
+  // ---- score (échelle 0 → 200, escalier piloté par le volume — spec §7) ----
+  LIT_MIN: 100,                  // base = tous N1 verts + volume groupe > veille  → 100
+  FORT_MIN: 135,                 // score ≥  → tier FORT
+  ULTIME_MIN: 175,               // score ≥  → tier ULTIME 🚨 (alerte forte)
+  PREMIUM_MIN: 150,              // score ≥  → surligné/drapeau premium en tête
 };
  
 // instruments du bandeau marché — proxies ETF/actions (tous dans le feed Stocks Starter).
@@ -310,6 +338,13 @@ function fmtUSD(v){
   if(v>=1e3) return "$"+(v/1e3).toFixed(0)+"k";
   return "$"+v.toFixed(0);
 }
+function fmtNum(v){
+  if(v==null||!isFinite(v)) return "";
+  if(v>=1e9) return (v/1e9).toFixed(1)+"B";
+  if(v>=1e6) return (v/1e6).toFixed(1)+"M";
+  if(v>=1e3) return (v/1e3).toFixed(0)+"k";
+  return ""+Math.round(v);
+}
 function ymd(d){ return d.toISOString().slice(0,10); }
  
 // stockage clé — localStorage si dispo (site déployé), sinon mémoire (aperçu/sandbox)
@@ -333,6 +368,7 @@ function toast(msg){
 const STATE = {
   blocs: [],                 // bibliothèque (blocs.json)
   universe: [],              // tickers uniques (N1∪N2∪N3 + macro)
+  n1Universe: [],            // tickers N1 (purs) — capi chargée pour le score
   bars: {},                  // ticker -> [{t,o,h,l,c,v}]  (trié asc)
   metrics: {},               // ticker -> objet métriques
   dead: new Set(),           // tickers sans données (liste de nettoyage)
@@ -406,18 +442,19 @@ function computeMetrics(bars){
  
 /* ---------------- indicateurs + score (spec §5–§7) ---------------- */
 function computeBloc(b){
-  const M=STATE.metrics;
+  const M=STATE.metrics, C=STATE.capCache;
   const cells = lvl => (b[lvl]||[]).map(t=>({t,m:M[t]}));
   const all1 = cells("N1"), all2 = cells("N2");
   const n1 = all1.filter(x=>x.m), n2 = all2.filter(x=>x.m);
   const n1Valid=n1.length, n2Valid=n2.length;
  
-  const base = { bloc:b, lit:false, ind2:false, tier:null, score:0,
+  const base = { bloc:b, lit:false, tier:null, score:0,
                  n1All:all1, n2All:all2,
                  invalidN1: all1.length-n1Valid, invalidN2: all2.length-n2Valid,
-                 motorRatio:0, wagonRatio:0, greenN1:0, buyable:[], participation:0,
-                 posRange:0, perf20mean:0, volMult:0, groupVar:0,
-                 dormant:false, abnormal:false, n2conf:false, outperf:false };
+                 greenN1:0, buyable:[], participation:0,
+                 volMult:0, volUp:false, indivPart:0,
+                 posRange:0, perf20mean:0, groupVar:0, medCap:null,
+                 dormant:false, abnormal:false, n2conf:false, outperf:false, smallCap:false };
   if(n1Valid===0) return base;
  
   // agrégats groupe N1 (calculés une fois)
@@ -432,45 +469,54 @@ function computeBloc(b){
   const volMult    = sumMA ? sumVj/sumMA : 0;
   const greenN2    = n2.filter(x=>x.m.green).length;
   const n2Ratio    = n2Valid ? greenN2/n2Valid : 0;
+  const indivPart  = greenN1cells.filter(x=>x.m.vol>x.m.prevVol).length / n1Valid; // type B (part des N1 dont le vol monte)
  
-  // --- Indicateur 1 : filet large (déclenchement sur le groupe N1) ---
-  const allGreen = greenN1===n1Valid;                 // 1. tous N1 verts
-  const ind1 = allGreen && sumVj>sumVj1;              // 2. volume total N1 en hausse
-  // filtres d'achat par action verte : vol indiv en hausse + liquidité
-  const buyable = greenN1cells.filter(x => x.m.vol>x.m.prevVol && x.m.dollarVol>CONFIG.LIQUIDITY_FLOOR);
+  // capitalisation médiane des N1 (si chargée) — pour la dormance "petite capi"
+  const caps = n1.map(x=>C[x.t]).filter(v=>typeof v==="number" && v>0).sort((a,b)=>a-b);
+  const medCap = caps.length ? caps[Math.floor(caps.length/2)] : null;
+  const smallCap = medCap!=null && medCap < CONFIG.SMALLCAP_MAX;
  
-  // --- Indicateur 2 : pépite (tout l'ind1 + 4 conditions premium) ---
-  const dormant  = posRange < CONFIG.DORMANCY_RANGE_MAX && perf20mean < CONFIG.PERF20_MAX; // 5
-  const abnormal = volMult > CONFIG.ABNORMAL_VOL_MULT;                                     // 6
-  const n2conf   = n2Valid>0 && n2Ratio>0.5;                                               // 7
-  const outperf  = (groupVar - STATE.marketVar) > CONFIG.MARKET_OUTPERF_MARGIN;            // 8
-  const ind2 = ind1 && dormant && abnormal && n2conf && outperf;
+  // conditions
+  const allGreen   = greenN1===n1Valid;                 // tous N1 verts
+  const groupVolUp = sumVj>sumVj1;                       // volume TOTAL groupe > veille (type A)
+  const lit        = allGreen && groupVolUp;            // base validée = 100
+  const dormant    = smallCap && posRange<CONFIG.DORMANCY_RANGE_MAX && perf20mean<CONFIG.PERF20_MAX; // petit ET bas ET calme
+  const abnormal   = volMult>CONFIG.ABNORMAL_VOL_MULT;  // afflux (bonus, pas filtre)
+  const n2conf     = n2Valid>0 && n2Ratio>0.5;
+  const outperf    = (groupVar - STATE.marketVar) > CONFIG.MARKET_OUTPERF_MARGIN;
  
-  // --- score 3 couches ---
-  const motorRatio = greenN1/n1Valid;
-  const wagonRatio = n2Ratio;
-  // couche 1+2 : moteurs, + wagons qui rattrapent les failles moteur
-  const eff = motorRatio + (1-motorRatio)*wagonRatio*CONFIG.WAGON_COMP;
-  let score = 100*eff;
-  // couche 3 (information — pondère, ne bloque pas)
-  score += clamp((volMult-1)*6, 0, 15);                                  // intensité volume
-  score += clamp((groupVar-STATE.marketVar)*300, 0, 10);                 // surperf marché
-  score += clamp((CONFIG.DORMANCY_RANGE_MAX-posRange)/CONFIG.DORMANCY_RANGE_MAX*8, 0, 8); // proximité bas 52s
-  const members=[...n1,...n2];
-  const participation = members.length ? members.filter(x=>x.m.green).length/members.length : 0;
-  score += clamp((participation-0.5)*14, 0, 7);                          // participation
-  score *= (CONFIG.PERT_MULT[b.pertinence] || 1.0);                      // qualité du bloc
-  score = Math.round(score);
+  // --- SCORE : escalier 0 → ~200 piloté par le VOLUME (spec §7) ---
+  let score;
+  if(!lit){
+    // tiède : reste SOUS 100. Reflète la proximité (moteurs verts + volume groupe qui monte ou non)
+    score = Math.min(99, Math.round((greenN1/n1Valid)*85 + (groupVolUp?10:0)));
+  } else {
+    score  = 100;                            // base : tous verts + volume groupe > veille
+    score += indivPart*10;                   // type B : chaque action participe → ~110
+    score += Math.max(0, volMult-1)*30;      // intensité : ×2 → ~140, ×3 → ~160+, sans plafond
+    if(outperf) score += 12;                 // bat le marché
+    if(dormant) score += 12;                 // dormance saine (petit + bas + calme)
+    if(n2conf)  score += 12;                 // N2 confirme
+    score = Math.round(score);
+  }
+  score += (b.pertinence==='A'?3 : b.pertinence==='B'?1 : 0);  // départage à signal égal (§11.2)
  
   let tier=null;
-  if(ind2) tier="ULTIME";
-  else if(ind1 && buyable.length>0 && score>=CONFIG.FORT_SCORE_MIN) tier="FORT";
-  else if(ind1) tier="VOL_OK";
+  if(lit){
+    if(score>=CONFIG.ULTIME_MIN) tier="ULTIME";
+    else if(score>=CONFIG.FORT_MIN) tier="FORT";
+    else tier="VOL_OK";
+  }
+  // actions "achetables" (info) : vertes + vol indiv en hausse + liquides
+  const buyable = greenN1cells.filter(x => x.m.vol>x.m.prevVol && x.m.dollarVol>CONFIG.LIQUIDITY_FLOOR);
+  const members=[...n1,...n2];
+  const participation = members.length ? members.filter(x=>x.m.green).length/members.length : 0;
  
-  return { ...base, lit:ind1, ind2, tier, score,
-           motorRatio, wagonRatio, greenN1, buyable:buyable.map(x=>x.t),
-           participation, posRange, perf20mean, volMult, groupVar,
-           dormant, abnormal, n2conf, outperf };
+  return { ...base, lit, tier, score,
+           greenN1, buyable:buyable.map(x=>x.t), participation,
+           volMult, volUp:groupVolUp, indivPart,
+           posRange, perf20mean, groupVar, medCap,
+           dormant, abnormal, n2conf, outperf, smallCap };
 }
  
 function computeAll(){
@@ -484,14 +530,13 @@ function computeAll(){
   const ref = STATE.metrics[MARKET_REF];
   STATE.marketVar = ref ? ref.chg : 0;
  
-  // blocs
+  // blocs — tri par score décroissant (le score encode tout : ≥100 allumé, ≥175 ultime)
   const res = STATE.blocs.map(computeBloc);
-  const rank = r => r.tier==="ULTIME"?3 : r.tier==="FORT"?2 : r.tier==="VOL_OK"?1 : 0;
-  res.sort((a,b)=> rank(b)-rank(a) || b.score-a.score);
+  res.sort((a,b)=> b.score-a.score);
   STATE.results=res;
  
-  // notifications : nouveaux ultimes seulement
-  const nowUlt = new Set(res.filter(r=>r.ind2).map(r=>r.bloc.id));
+  // notifications : nouveaux blocs ULTIME seulement
+  const nowUlt = new Set(res.filter(r=>r.tier==="ULTIME").map(r=>r.bloc.id));
   const fresh = [...nowUlt].filter(id=>!STATE.lastUltimes.has(id));
   if(fresh.length && $("tgAlert").classList.contains("on")) notifyUltime(fresh.length);
   STATE.lastUltimes = nowUlt;
@@ -520,7 +565,7 @@ function renderCounts(){
   $("cFort").textContent= r.filter(x=>x.tier==="FORT").length;
   $("cVol").textContent = r.filter(x=>x.tier==="VOL_OK").length;
   $("cSec").textContent = STATE.blocs.length;
-  const ult=r.filter(x=>x.ind2);
+  const ult=r.filter(x=>x.tier==="ULTIME");
   const a=$("alert");
   if(ult.length){ a.classList.add("show"); $("alertSub").textContent =
     ult.length+" bloc"+(ult.length>1?"s":"")+" à profil ×10 : "+ult.slice(0,3).map(x=>x.bloc.nom).join(" · ")+(ult.length>3?" …":""); }
@@ -529,14 +574,21 @@ function renderCounts(){
  
 function memberRow(cell, isN1){
   const t=cell.t, m=cell.m;
-  if(!m) return `<tr><td>${t}<span class="lvltag">${isN1?'N1':'N2'} · ✗</span></td><td colspan="4" class="flat">pas de données</td></tr>`;
+  if(!m) return `<tr><td>${t}<span class="lvltag">${isN1?'N1':'N2'} · ✗</span></td><td colspan="5" class="flat">pas de données</td></tr>`;
   const liq = m.dollarVol<CONFIG.LIQUIDITY_FLOOR
       ? `<span class="noliq">${fmtUSD(m.dollarVol)} ⚠︎</span>` : fmtUSD(m.dollarVol);
-  const cap = STATE.capCache[t]!=null ? `<span class="capi">${fmtUSD(STATE.capCache[t])}</span>` : '<span class="flat">—</span>';
   const rp = Math.round(m.rangePos*100);
+  const vr = m.volMA20 ? m.vol/m.volMA20 : 0;          // volume du jour vs moyenne 20j
+  const vUp = m.vol>m.prevVol;                          // vs veille
+  const vcls = (vr>=CONFIG.ABNORMAL_VOL_MULT||vUp) ? 'up' : 'dn';
+  const cv = STATE.capCache[t];
+  const cap = (typeof cv==="number" && cv>0)
+      ? `<span class="${cv<CONFIG.SMALLCAP_MAX?'up':'flat'}">${fmtUSD(cv)}</span>`   // petit = vert (potentiel ×10)
+      : '<span class="flat">—</span>';
   return `<tr>
     <td>${t}<span class="lvltag">${isN1?'N1':'N2'}</span></td>
     <td class="${cls(m.chg)}">${fmtPct(m.chg)}</td>
+    <td class="${vcls}">×${vr.toFixed(1)} ${vUp?'↑':'↓'}<span class="vraw">${fmtNum(m.vol)}</span></td>
     <td>${liq}</td>
     <td>${cap}</td>
     <td><span class="rangebar"><i style="left:${clamp(rp,0,96)}%"></i></span> ${rp}%</td>
@@ -546,30 +598,42 @@ function memberRow(cell, isN1){
 function renderBloc(r, idx){
   const b=r.bloc;
   const div=document.createElement("div");
-  div.className="bloc"+(r.tier?(" t-"+r.tier):"")+(STATE.openIds.has(b.id)?" open":"");
+  div.className="bloc"+(r.tier?(" t-"+r.tier):"")+(r.score>=CONFIG.PREMIUM_MIN?" premium":"")+(STATE.openIds.has(b.id)?" open":"");
   div.dataset.id=b.id;
  
-  // chips N1 (verts / achetables / morts), puis N2 confirmant
+  // jauge de score (pastille ronde) — visible sans ouvrir : 0 → ~200 (175+ = ultime)
+  const n1Valid = r.n1All.filter(c=>c.m).length;
+  const gaugeDeg = clamp(r.score/200*360, 0, 360);
+  let gaugeColor = "var(--faint)";
+  if(r.tier==="ULTIME") gaugeColor="var(--ultime2)";
+  else if(r.tier==="FORT") gaugeColor="var(--amber)";
+  else if(r.tier==="VOL_OK") gaugeColor="var(--yellow)";
+ 
+  // chips — N1 (purs) et N2 (confirment) affichés dans DEUX zones séparées
   const chip = (cell,isN1)=>{
     const t=cell.t, m=cell.m;
     if(!m) return `<span class="tk dead">${t}</span>`;
     let c="tk";
     if(isN1){ if(r.buyable.includes(t)) c="tk buy"; else if(m.green) c="tk g"; }
     else if(m.green) c="tk g";
-    return `<span class="${c}">${t}<span class="lvl">${isN1?'':'·N2'}</span></span>`;
+    return `<span class="${c}">${t}</span>`;
   };
   const n1chips = r.n1All.map(c=>chip(c,true)).join("");
-  const n2chips = r.n2All.filter(c=>c.m&&c.m.green).map(c=>chip(c,false)).join("");
+  const n2chips = r.n2All.map(c=>chip(c,false)).join("");
  
   const tierLbl = r.tier==="VOL_OK"?"VOL OK":r.tier;
+  const volClass = r.volMult>=CONFIG.ABNORMAL_VOL_MULT ? 'hot' : (r.volUp ? 'up' : 'dn');
+  const volBadge = `<span class="volb ${volClass}">vol ×${r.volMult.toFixed(1)} ${r.volUp?'↑':'↓'}</span>`;
   const sub = r.lit
-    ? `${r.greenN1}/${r.n1All.filter(c=>c.m).length} moteurs · ${r.buyable.length} achetable${r.buyable.length>1?'s':''} · vol ×${r.volMult.toFixed(1)} · part ${Math.round(r.participation*100)}%`
-    : `${r.greenN1}/${r.n1All.filter(c=>c.m).length} moteurs verts — pas de déclenchement`;
+    ? `${volBadge} ${r.greenN1}/${n1Valid} purs · ${r.buyable.length} achetable${r.buyable.length>1?'s':''} · part ${Math.round(r.participation*100)}%`
+    : `${volBadge} ${r.greenN1}/${n1Valid} purs verts`;
  
   const cnd = c => `<span class="cb ${c.ok?'ok':'no'}">${c.ok?'✓':'·'} ${c.l}</span>`;
+  const lowCalm = r.posRange<CONFIG.DORMANCY_RANGE_MAX && r.perf20mean<CONFIG.PERF20_MAX;
   const conds = [
-    {l:"dormance", ok:r.dormant},
-    {l:"vol anormal", ok:r.abnormal},
+    {l:"petite capi", ok:r.smallCap},
+    {l:"bas 52s + calme", ok:lowCalm},
+    {l:"vol anormal ×2-3", ok:r.abnormal},
     {l:"N2 confirme", ok:r.n2conf},
     {l:"bat marché", ok:r.outperf},
   ].map(cnd).join("");
@@ -585,16 +649,19 @@ function renderBloc(r, idx){
         <div class="bsub">${sub}</div>
       </div>
       ${r.tier?`<span class="tier ${r.tier}">${tierLbl}</span>`:''}
-      <div class="score">${r.lit?r.score:'·'}</div>
+      <div class="gauge" title="score ${r.score} / 200"><div class="ring" style="--deg:${gaugeDeg};--gc:${gaugeColor}"></div><div class="hole"><span class="num">${r.score}</span></div></div>
       <div class="chev">▶</div>
     </div>
-    ${ (n1chips||n2chips) ? `<div class="chips-row">${n1chips}${n2chips}</div>` : '' }
+    <div class="zones">
+      <div class="zone"><div class="zlbl">Purs · N1 <span class="zc">${r.greenN1}/${n1Valid} verts</span></div><div class="chips-row">${n1chips||'<span class="znone">aucune donnée</span>'}</div></div>
+      ${ r.n2All.length ? `<div class="zone n2zone"><div class="zlbl">Confirment · N2</div><div class="chips-row">${n2chips}</div></div>` : '' }
+    </div>
     <div class="detail">
       <div class="cond">${conds}</div>
-      <table class="mtbl">
-        <thead><tr><th>Ticker</th><th>Jour</th><th>Liquidité</th><th>Capi</th><th>Pos. 52s</th></tr></thead>
+      <div class="mwrap"><table class="mtbl">
+        <thead><tr><th>Ticker</th><th>Jour</th><th>Vol ×MA20</th><th>Liquidité</th><th>Capi</th><th>Pos. 52s</th></tr></thead>
         <tbody>${rowsN1}${rowsN2}</tbody>
-      </table>
+      </table></div>
     </div>`;
  
   const head=div.querySelector(".bhead");
@@ -670,14 +737,28 @@ async function fullScan(){
     catch(e){ if(String(e.message).includes("clé")) authFailed=true; STATE.bars[t]=STATE.bars[t]||[]; }
     done++;
     if(done%5===0 || done===total){
-      $("pfill").style.width=(done/total*100)+"%";
-      $("ptxt").textContent=`${done} / ${total} tickers`;
+      $("pfill").style.width=(done/total*60)+"%";
+      $("ptxt").textContent=`prix : ${done} / ${total} tickers`;
+    }
+  }, CONFIG.CONCURRENCY);
+ 
+  if(authFailed){ prog.classList.remove("show"); STATE.scanning=false; $("rescanBtn").disabled=false; setStatus("clé refusée", false); toast("Clé Polygon refusée — vérifie-la"); return; }
+ 
+  // phase 2 : capitalisations des PURS (N1) — le score en a besoin (dormance = petite capi)
+  const capT = STATE.n1Universe.filter(t => STATE.bars[t] && STATE.bars[t].length>=2 && STATE.capCache[t]===undefined);
+  let cdone=0;
+  await pool(capT, async (t)=>{
+    try{ const j=await poly(`/v3/reference/tickers/${encodeURIComponent(t)}`); STATE.capCache[t]=(j&&j.results&&j.results.market_cap)||null; }
+    catch(e){ STATE.capCache[t]=null; }
+    cdone++;
+    if(cdone%5===0 || cdone===capT.length){
+      $("pfill").style.width=(60+(capT.length?cdone/capT.length:1)*40)+"%";
+      $("ptxt").textContent=`capi : ${cdone} / ${capT.length}`;
     }
   }, CONFIG.CONCURRENCY);
  
   prog.classList.remove("show");
   STATE.scanning=false; $("rescanBtn").disabled=false;
-  if(authFailed){ setStatus("clé refusée", false); toast("Clé Polygon refusée — vérifie-la"); return; }
   computeAll();
   setStatus("en ligne", true);
   stampMaj();
@@ -772,6 +853,10 @@ async function loadBlocs(){
   for(const b of STATE.blocs) for(const lvl of ["N1","N2","N3"]) (b[lvl]||[]).forEach(t=>set.add(t));
   MACRO.forEach(m=>set.add(m.t));
   STATE.universe=[...set];
+  // univers N1 (purs) seul — capi chargée pour eux (score / dormance)
+  const n1set=new Set();
+  for(const b of STATE.blocs) (b.N1||[]).forEach(t=>n1set.add(t));
+  STATE.n1Universe=[...n1set];
   $("cSec").textContent=STATE.blocs.length;
 }
  
