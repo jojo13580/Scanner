@@ -370,11 +370,12 @@ function sortRows(rows){
     dvol:  r=>r.vol*r.price,
     chg:   r=>r.chg,
     price: r=>r.price,
-    pos52: r=>{ const g=STATE.range52[r.ticker]; if(!g||!(g.high52>g.low52)) return -1; return (r.price-g.low52)/(g.high52-g.low52); },
+    pos52: r=>{ const g=STATE.range52[r.ticker]; if(!g||!(g.high52>g.low52)) return 2; return (r.price-g.low52)/(g.high52-g.low52); },
     ticker:r=>r.ticker,
   }[s] || (r=>r.vol/r.prev);
   const arr=[...rows];
   if(s==="ticker") arr.sort((a,b)=> key(a)<key(b)?-1:1);
+  else if(s==="pos52") arr.sort((a,b)=> key(a)-key(b));   // plus bas 52 semaines d'abord
   else arr.sort((a,b)=> key(b)-key(a));
   return arr;
 }
