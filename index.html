@@ -71,8 +71,10 @@ header{
   border-radius:11px;padding:9px 11px;
 }
 .mcard .mk{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.mcard .mvia{font-size:8.5px;color:var(--faint);font-weight:600;letter-spacing:0}
 .mcard .mv{font-family:var(--mono);font-size:15px;font-weight:700;margin-top:2px}
 .mcard .mc{font-family:var(--mono);font-size:11px;font-weight:500;margin-top:1px}
+.mcard .mc.big{font-size:17px;font-weight:700;margin-top:5px}
  
 /* ---------- alert ---------- */
 .alert{
@@ -175,6 +177,8 @@ header{
 .tk.g{color:var(--green);border-color:rgba(63,208,127,.35);background:rgba(63,208,127,.08)}
 .tk.buy{color:var(--green);border-color:var(--green);background:rgba(63,208,127,.14);font-weight:700}
 .tk.dead{color:var(--faint);text-decoration:line-through;opacity:.7}
+.tk.n2{color:var(--muted);background:transparent;border-color:var(--border);border-style:dashed}
+.zlbl .zc.conf{color:var(--green)}
 .tk .lvl{font-size:8.5px;opacity:.6}
  
 .detail{display:none;border-top:1px solid var(--border);background:var(--bg2)}
@@ -197,8 +201,10 @@ header{
 .vmult{font-weight:700}
 .vmult.up{color:var(--green)} .vmult.dn{color:var(--red)} .vmult.hot{color:var(--amber)}
 .vraw{display:block;font-size:8.5px;color:var(--faint);font-weight:400;margin-top:1px}
+.live{font-size:8px;font-weight:700;color:var(--sky);margin-left:4px;vertical-align:top}
  
 .empty{text-align:center;color:var(--muted);padding:40px 16px;font-size:13px}
+.morebtn{display:block;width:100%;margin:4px 0 2px;background:var(--panel2);border:1px solid var(--border2);color:var(--muted);font-weight:600}
 .empty b{color:var(--text)}
  
 /* cleaning */
@@ -315,6 +321,7 @@ const CONFIG = {
   FORT_MIN: 135,                 // score ≥  → tier FORT
   ULTIME_MIN: 175,               // score ≥  → tier ULTIME 🚨 (alerte forte)
   PREMIUM_MIN: 150,              // score ≥  → surligné/drapeau premium en tête
+  DEFAULT_SHOW: 12,              // nb de blocs (les plus chauds) affichés au départ — le reste derrière « voir les autres »
 };
  
 // instruments du bandeau marché — proxies ETF/actions (tous dans le feed Stocks Starter).
@@ -348,7 +355,33 @@ function fmtNum(v){
   if(v>=1e3) return (v/1e3).toFixed(0)+"k";
   return ""+Math.round(v);
 }
+// capitalisation = actions en circulation × prix du jour (cohérent avec le prix affiché)
+function capOf(t){
+  const s=STATE.sharesCache[t], m=STATE.metrics[t];
+  return (typeof s==="number" && s>0 && m && m.close) ? s*m.close : null;
+}
 function ymd(d){ return d.toISOString().slice(0,10); }
+ 
+/* ---- heure de marché US (ET) + fraction de séance (corrige le volume intraday) ---- */
+const _ETDATE = new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'});
+const _ETTIME = new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',hour12:false,weekday:'short'});
+function etDateStr(ms){ try{ return _ETDATE.format(new Date(ms)); }catch(e){ return null; } }
+function nowET(){
+  let h=0,m=0,wd='';
+  for(const p of _ETTIME.formatToParts(new Date())){
+    if(p.type==='hour') h=+p.value; else if(p.type==='minute') m=+p.value; else if(p.type==='weekday') wd=p.value;
+  }
+  if(h===24) h=0;
+  return { min:h*60+m, dateStr:_ETDATE.format(new Date()), weekday:wd };
+}
+// état de la séance US : marché ouvert ? + date du jour (ET) — sert juste à repérer la barre "en direct".
+function sessionInfo(){
+  const e=nowET();
+  const isWeekday = !/Sat|Sun/.test(e.weekday);
+  const minOpen = e.min - 570;                          // minutes depuis 9h30 ET (clôture = 390)
+  const open = isWeekday && minOpen>0 && minOpen<=390;  // (jours fériés non gérés → la garde de date couvre le cas)
+  return { open, dateStr:e.dateStr };
+}
  
 // stockage clé — localStorage si dispo (site déployé), sinon mémoire (aperçu/sandbox)
 let MEM_KEY = "";
@@ -375,7 +408,7 @@ const STATE = {
   bars: {},                  // ticker -> [{t,o,h,l,c,v}]  (trié asc)
   metrics: {},               // ticker -> objet métriques
   dead: new Set(),           // tickers sans données (liste de nettoyage)
-  capCache: {},              // ticker -> market cap (chargé à la demande)
+  sharesCache: {},           // ticker -> actions en circulation (capi = actions × prix du jour)
   results: [],               // résultats blocs triés
   marketVar: 0,
   lastUltimes: new Set(),    // pour ne notifier que les NOUVEAUX ultimes
@@ -383,9 +416,11 @@ const STATE = {
   filterPert: "all",
   search: "",
   litOnly: true,
+  showAll: false,            // false = n'affiche que les DEFAULT_SHOW plus chauds
   autoTimer: null,
   audioCtx: null,
   openIds: new Set(),        // blocs dépliés (persistés entre re-rendus)
+  session: {open:false,fraction:1,dateStr:null},  // état séance US (pour le volume projeté intraday)
 };
  
 /* ---------------- Polygon ---------------- */
@@ -423,29 +458,56 @@ async function fetchGroupedDay(dateStr){
   return map;
 }
  
+// snapshot marché complet : volume du JOUR (en cours) + veille, frais (mis à jour en continu, au décalage du flux près).
+// Source la plus fraîche pour l'intraday — remplace le grouped-daily (orienté fin de séance) au refresh léger.
+async function fetchSnapshotAll(){
+  const j = await poly(`/v2/snapshot/locale/us/markets/stocks/tickers`);
+  const arr = j && (j.tickers || j.results);
+  const map={};
+  if(arr) for(const it of arr){
+    if(!it || !it.ticker) continue;
+    map[it.ticker] = { day: it.day||null, prevDay: it.prevDay||null,
+                       ts: it.updated ? Math.floor(it.updated/1e6) : Date.now() };
+  }
+  return map;
+}
+ 
 /* ---------------- métriques (spec §4) ---------------- */
 function computeMetrics(bars){
   if(!bars || bars.length<2) return null;
   const n=bars.length;
+  const sess = STATE.session || {open:false, dateStr:null};
+  const todayBar = sess.dateStr!=null && etDateStr(bars[n-1].t)===sess.dateStr;  // dernière barre = aujourd'hui ?
+  const live = todayBar && sess.open;          // volume du jour en cours = "en direct"
+ 
   const close=bars[n-1].c, prevClose=bars[n-2].c;
   const high=bars[n-1].h, low=bars[n-1].l;
-  const vol=bars[n-1].v, prevVol=bars[n-2].v;
-  const kv=Math.min(20,n); let sv=0; for(let i=n-kv;i<n;i++) sv+=bars[i].v;
-  const volMA20 = sv/kv;
+  const vol=bars[n-1].v;                        // VOLUME EN DIRECT (cumul du jour si séance ; sinon dernière séance complète)
+  const prevVol=bars[n-2].v;                    // VOLUME DE LA VEILLE (journée complète)
+ 
+  // VOLUME MOYEN 20 JOURS sur journées COMPLÈTES (exclut le jour en cours → baseline propre)
+  const endIdx = todayBar ? n-1 : n;           // borne haute exclusive
+  const kv=Math.min(20, endIdx); let sv=0;
+  for(let i=endIdx-kv;i<endIdx;i++) sv+=bars[i].v;
+  const volMA20 = kv ? sv/kv : vol;
+ 
+  // 52 semaines
   const kw=Math.min(252,n); let lo=Infinity,hi=-Infinity;
   for(let i=n-kw;i<n;i++){ if(bars[i].l<lo)lo=bars[i].l; if(bars[i].h>hi)hi=bars[i].h; }
+  // perf 20j
   const i20=Math.max(0,n-21); const c20=bars[i20].c;
   const perf20 = c20 ? close/c20-1 : 0;
+ 
   const dollarVol = volMA20*close;
   const chg = prevClose ? close/prevClose-1 : 0;
   const rangePos = (hi>lo) ? clamp((close-lo)/(hi-lo),0,1) : 0.5;
-  return { close,prevClose,high,low,vol,prevVol,volMA20,low52:lo,high52:hi,
-           perf20,dollarVol,chg,green:close>prevClose,rangePos };
+  return { close,prevClose,high,low, vol,prevVol,volMA20, live,
+           low52:lo,high52:hi, perf20,dollarVol,chg,green:close>prevClose,rangePos };
 }
  
 /* ---------------- indicateurs + score (spec §5–§7) ---------------- */
 function computeBloc(b){
-  const M=STATE.metrics, C=STATE.capCache;
+  const M=STATE.metrics;
   const cells = lvl => (b[lvl]||[]).map(t=>({t,m:M[t]}));
   const all1 = cells("N1"), all2 = cells("N2");
   const n1 = all1.filter(x=>x.m), n2 = all2.filter(x=>x.m);
@@ -475,7 +537,7 @@ function computeBloc(b){
   const indivPart  = greenN1cells.filter(x=>x.m.vol>x.m.prevVol).length / n1Valid; // type B (part des N1 dont le vol monte)
  
   // capitalisation médiane des N1 (si chargée) — pour la dormance "petite capi"
-  const caps = n1.map(x=>C[x.t]).filter(v=>typeof v==="number" && v>0).sort((a,b)=>a-b);
+  const caps = n1.map(x=>capOf(x.t)).filter(v=>typeof v==="number" && v>0).sort((a,b)=>a-b);
   const medCap = caps.length ? caps[Math.floor(caps.length/2)] : null;
   const smallCap = medCap!=null && medCap < CONFIG.SMALLCAP_MAX;
  
@@ -523,6 +585,7 @@ function computeBloc(b){
 }
  
 function computeAll(){
+  STATE.session = sessionInfo();          // séance US + fraction (pour le volume projeté intraday)
   // métriques de tous les tickers
   STATE.metrics={}; STATE.dead.clear();
   for(const t of STATE.universe){
@@ -552,12 +615,10 @@ function renderMacro(){
   const el=$("macro"); el.innerHTML="";
   for(const mk of MACRO){
     const m=STATE.metrics[mk.t];
-    const card=document.createElement("div"); card.className="mcard";
-    const v = m ? m.close.toFixed(2) : "--";
     const c = m ? fmtPct(m.chg) : "--";
-    card.innerHTML = `<div class="mk">${mk.label}</div>
-      <div class="mv">${v}</div>
-      <div class="mc ${m?cls(m.chg):''}">${c}</div>`;
+    const card=document.createElement("div"); card.className="mcard";
+    card.innerHTML = `<div class="mk">${mk.label} <span class="mvia">${mk.t}</span></div>
+      <div class="mc big ${m?cls(m.chg):'flat'}">${c}</div>`;
     el.appendChild(card);
   }
 }
@@ -581,17 +642,18 @@ function memberRow(cell, isN1){
   const liq = m.dollarVol<CONFIG.LIQUIDITY_FLOOR
       ? `<span class="noliq">${fmtUSD(m.dollarVol)} ⚠︎</span>` : fmtUSD(m.dollarVol);
   const rp = Math.round(m.rangePos*100);
-  const vr = m.volMA20 ? m.vol/m.volMA20 : 0;          // volume du jour vs moyenne 20j
-  const vUp = m.vol>m.prevVol;                          // maintenant vs hier
-  const vcls = vr>=CONFIG.ABNORMAL_VOL_MULT ? 'hot' : (vUp ? 'up' : 'dn');
-  const cv = STATE.capCache[t];
+  const hot = m.volMA20 && m.vol > 2*m.volMA20;        // direct nettement au-dessus de la moyenne 20j
+  const up  = m.volMA20 && m.vol > m.volMA20;           // direct au-dessus de la moyenne 20j
+  const vcls = hot ? 'hot' : (up ? 'up' : 'dn');
+  const liveDot = m.live ? '<span class="live">● live</span>' : '';
+  const cv = capOf(t);
   const cap = (typeof cv==="number" && cv>0)
       ? `<span class="${cv<CONFIG.SMALLCAP_MAX?'up':'flat'}">${fmtUSD(cv)}</span>`   // petit = vert (potentiel ×10)
       : '<span class="flat">—</span>';
   return `<tr>
     <td>${t}<span class="lvltag">${isN1?'N1':'N2'}</span></td>
     <td class="${cls(m.chg)}">${fmtPct(m.chg)}</td>
-    <td><span class="vmult ${vcls}">×${vr.toFixed(1)} ${vUp?'↑':'↓'}</span><span class="vraw">${fmtNum(m.prevVol)} → ${fmtNum(m.vol)}</span></td>
+    <td><span class="vmult ${vcls}">${fmtNum(m.vol)}</span>${liveDot}<span class="vraw">veille ${fmtNum(m.prevVol)} · 20j ${fmtNum(m.volMA20)}</span></td>
     <td>${liq}</td>
     <td>${cap}</td>
     <td><span class="rangebar"><i style="left:${clamp(rp,0,96)}%"></i></span> ${rp}%</td>
@@ -623,7 +685,9 @@ function renderBloc(r, idx){
     return `<span class="${c}">${t}</span>`;
   };
   const n1chips = r.n1All.map(c=>chip(c,true)).join("");
-  const n2chips = r.n2All.map(c=>chip(c,false)).join("");
+  const n2Valid = r.n2All.filter(c=>c.m).length;
+  const n2Green = r.n2All.filter(c=>c.m&&c.m.green).length;
+  const n2chips = r.n2All.map(c=> c.m ? `<span class="tk n2">${c.t}</span>` : `<span class="tk dead">${c.t}</span>`).join("");
  
   const tierLbl = r.tier==="VOL_OK"?"VOL OK":r.tier;
   const volClass = r.volMult>=CONFIG.ABNORMAL_VOL_MULT ? 'hot' : (r.volUp ? 'up' : 'dn');
@@ -661,12 +725,12 @@ function renderBloc(r, idx){
     </div>
     <div class="zones">
       <div class="zone"><div class="zlbl">Purs · N1 <span class="zc">${r.greenN1}/${n1Valid} verts</span></div><div class="chips-row">${n1chips||'<span class="znone">aucune donnée</span>'}</div></div>
-      ${ r.n2All.length ? `<div class="zone n2zone"><div class="zlbl">Confirment · N2</div><div class="chips-row">${n2chips}</div></div>` : '' }
+      ${ r.n2All.length ? `<div class="zone n2zone"><div class="zlbl">Confirment · N2 <span class="zc ${r.n2conf?'conf':''}">${n2Green}/${n2Valid} verts${r.n2conf?' ✓':''}</span></div><div class="chips-row">${n2chips}</div></div>` : '' }
     </div>
     <div class="detail">
       <div class="cond">${conds}</div>
       <div class="mwrap"><table class="mtbl">
-        <thead><tr><th>Ticker</th><th>Jour</th><th>Volume (hier→auj.)</th><th>Liquidité</th><th>Capi</th><th>Pos. 52s</th></tr></thead>
+        <thead><tr><th>Ticker</th><th>Jour</th><th>Volume — direct · veille · 20j</th><th>Liquidité</th><th>Capi</th><th>Pos. 52s</th></tr></thead>
         <tbody>${rowsN1}${rowsN2}</tbody>
       </table></div>
     </div>`;
@@ -700,7 +764,21 @@ function render(){
       "<b>Aucun bloc</b> ne correspond au filtre.<br>Décoche « Allumés seuls » pour tout voir.":
       "<b>Rien encore.</b><br>Connecte ta clé Polygon puis lance le scan."}</div>`;
   } else {
-    shown.forEach((r,i)=>list.appendChild(renderBloc(r,i)));
+    const limit = STATE.showAll ? shown.length : Math.min(shown.length, CONFIG.DEFAULT_SHOW);
+    shown.slice(0, limit).forEach((r,i)=>list.appendChild(renderBloc(r,i)));
+    if(shown.length>limit){
+      const more=document.createElement("button");
+      more.className="btn morebtn";
+      more.textContent=`Voir les ${shown.length-limit} autres ▾`;
+      more.addEventListener("click", ()=>{ STATE.showAll=true; render(); });
+      list.appendChild(more);
+    } else if(STATE.showAll && shown.length>CONFIG.DEFAULT_SHOW){
+      const less=document.createElement("button");
+      less.className="btn morebtn";
+      less.textContent="Réduire ▴";
+      less.addEventListener("click", ()=>{ STATE.showAll=false; render(); window.scrollTo({top:0,behavior:'smooth'}); });
+      list.appendChild(less);
+    }
   }
   // liste de nettoyage
   const dead=[...STATE.dead].filter(t=>!MACRO.find(m=>m.t===t)).sort();
@@ -715,14 +793,15 @@ function render(){
 /* ---------------- capitalisation (à la demande, par bloc ouvert) ---------------- */
 async function loadCaps(r){
   const tickers = [...r.n1All, ...r.n2All].map(c=>c.t)
-    .filter(t=>STATE.metrics[t] && STATE.capCache[t]===undefined);
+    .filter(t=>STATE.metrics[t] && STATE.sharesCache[t]===undefined);
   if(!tickers.length) return;
-  for(const t of tickers) STATE.capCache[t]=null;  // marque "en cours" (évite double fetch)
+  for(const t of tickers) STATE.sharesCache[t]=null;  // marque "en cours" (évite double fetch)
   for(const t of tickers){
     try{
       const j=await poly(`/v3/reference/tickers/${encodeURIComponent(t)}`);
-      STATE.capCache[t] = (j&&j.results&&j.results.market_cap)||null;
-    }catch(e){ STATE.capCache[t]=null; }
+      const o=j&&j.results;
+      STATE.sharesCache[t] = (o && (o.weighted_shares_outstanding||o.share_class_shares_outstanding))||null;
+    }catch(e){ STATE.sharesCache[t]=null; }
   }
   // re-render (l'état déplié est conservé via STATE.openIds)
   render();
@@ -752,11 +831,11 @@ async function fullScan(){
   if(authFailed){ prog.classList.remove("show"); STATE.scanning=false; $("rescanBtn").disabled=false; setStatus("clé refusée", false); toast("Clé Polygon refusée — vérifie-la"); return; }
  
   // phase 2 : capitalisations des PURS (N1) — le score en a besoin (dormance = petite capi)
-  const capT = STATE.n1Universe.filter(t => STATE.bars[t] && STATE.bars[t].length>=2 && STATE.capCache[t]===undefined);
+  const capT = STATE.n1Universe.filter(t => STATE.bars[t] && STATE.bars[t].length>=2 && STATE.sharesCache[t]===undefined);
   let cdone=0;
   await pool(capT, async (t)=>{
-    try{ const j=await poly(`/v3/reference/tickers/${encodeURIComponent(t)}`); STATE.capCache[t]=(j&&j.results&&j.results.market_cap)||null; }
-    catch(e){ STATE.capCache[t]=null; }
+    try{ const j=await poly(`/v3/reference/tickers/${encodeURIComponent(t)}`); const o=j&&j.results; STATE.sharesCache[t]=(o && (o.weighted_shares_outstanding||o.share_class_shares_outstanding))||null; }
+    catch(e){ STATE.sharesCache[t]=null; }
     cdone++;
     if(cdone%5===0 || cdone===capT.length){
       $("pfill").style.width=(60+(capT.length?cdone/capT.length:1)*40)+"%";
@@ -772,36 +851,51 @@ async function fullScan(){
   if($("tgAuto").classList.contains("on")) startAuto();
 }
  
-// refresh léger : 1 seul appel (grouped daily) → maj de la dernière barre
+// refresh léger : snapshot marché (volume du jour FRAIS) en priorité, grouped-daily en secours.
 async function lightRefresh(){
   if(STATE.scanning) return;
   if(!getKey() || !Object.keys(STATE.bars).length) return;
   STATE.scanning=true; setStatus("maj…", true);
+  const sess=sessionInfo(); STATE.session=sess;
   try{
-    let map=null, used=null;
-    for(let back=0; back<6; back++){                // dernière séance avec données
-      const d=new Date(Date.now()-back*864e5);
-      const day=d.getDay(); if(day===0||day===6) continue;   // week-end
-      const m=await fetchGroupedDay(ymd(d));
-      if(Object.keys(m).length>50){ map=m; used=ymd(d); break; }
-    }
-    if(!map){ STATE.scanning=false; setStatus("en ligne",true); return; }
-    // fusionne la barre du jour dans chaque série suivie
-    for(const t of STATE.universe){
-      const b=map[t]; if(!b) continue;
-      const series=STATE.bars[t]; if(!series||!series.length) continue;
-      const last=series[series.length-1];
-      const lastDay=ymd(new Date(last.t)); 
-      const bar={t:b.t,o:b.o,h:b.h,l:b.l,c:b.c,v:b.v};
-      if(used===lastDay) series[series.length-1]=bar;   // même séance → remplace
-      else series.push(bar);                            // nouvelle séance → ajoute
+    let snap=null;
+    try{ snap=await fetchSnapshotAll(); }catch(e){ snap=null; }
+ 
+    if(snap && Object.keys(snap).length>50){
+      const today=sess.dateStr;
+      for(const t of STATE.universe){
+        const s=snap[t]; if(!s||!s.day) continue;
+        const d=s.day; if(!(d.v>0)) continue;             // pas encore de volume aujourd'hui → on garde la barre existante
+        const series=STATE.bars[t]; if(!series||!series.length) continue;
+        const bar={t:s.ts||Date.now(),o:d.o,h:d.h,l:d.l,c:d.c,v:d.v};
+        const last=series[series.length-1];
+        if(etDateStr(last.t)===today) series[series.length-1]=bar;   // même séance → remplace
+        else series.push(bar);                                       // nouvelle séance → ajoute
+      }
+    } else {
+      // secours : grouped-daily (si le snapshot n'est pas exposé par l'abonnement)
+      let map=null, used=null;
+      for(let back=0; back<6; back++){
+        const d=new Date(Date.now()-back*864e5);
+        const day=d.getDay(); if(day===0||day===6) continue;
+        const m=await fetchGroupedDay(ymd(d));
+        if(Object.keys(m).length>50){ map=m; used=ymd(d); break; }
+      }
+      if(map) for(const t of STATE.universe){
+        const b=map[t]; if(!b) continue;
+        const series=STATE.bars[t]; if(!series||!series.length) continue;
+        const last=series[series.length-1];
+        const bar={t:b.t,o:b.o,h:b.h,l:b.l,c:b.c,v:b.v};
+        if(ymd(new Date(last.t))===used) series[series.length-1]=bar;
+        else series.push(bar);
+      }
     }
     STATE.scanning=false;
     computeAll();
     setStatus("en ligne", true); stampMaj();
   }catch(e){
     STATE.scanning=false; setStatus("en ligne", true);
-    // si le grouped échoue, on reste sur les dernières données ; rescan complet possible à la main
+    // en cas d'échec, on garde les dernières données ; rescan complet possible à la main
   }
 }
  
@@ -838,7 +932,10 @@ function beep(){
  
 /* ---------------- statut / auto ---------------- */
 function setStatus(txt, on){ $("statusTxt").textContent=txt; $("pulse").classList.toggle("on",!!on); }
-function stampMaj(){ const d=new Date(); $("lastMaj").textContent="MAJ "+d.toLocaleTimeString("fr-FR"); }
+function stampMaj(){
+  const d=new Date(); const s=STATE.session||{};
+  $("lastMaj").textContent="MAJ "+d.toLocaleTimeString("fr-FR")+(s.open?" · marché ouvert":" · marché fermé");
+}
 function startAuto(){ stopAuto(); STATE.autoTimer=setInterval(lightRefresh, CONFIG.REFRESH_SECONDS*1000); }
 function stopAuto(){ if(STATE.autoTimer){ clearInterval(STATE.autoTimer); STATE.autoTimer=null; } }
  
