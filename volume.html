@@ -95,6 +95,10 @@ tbody tr:hover{background:rgba(76,141,255,.05)}
 .rangebar{display:inline-block;width:46px;height:6px;background:var(--border2);border-radius:3px;position:relative;vertical-align:middle;margin-right:5px}
 .rangebar i{position:absolute;top:-1px;width:3px;height:8px;background:var(--sky);border-radius:1px}
 .pos52{color:var(--muted);font-size:11px}
+.flag{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:700;padding:1px 5px;border-radius:5px;margin-left:3px}
+.flag.rs{background:rgba(255,93,108,.18);color:var(--red);border:1px solid rgba(255,93,108,.5)}
+.flag.ok{background:rgba(63,208,127,.15);color:var(--green)}
+.flag.bad{background:rgba(255,93,108,.12);color:var(--red)}
 .noliq{color:var(--faint)}
 .empty{text-align:center;color:var(--muted);padding:48px 16px;font-size:13px}
 .empty b{color:var(--text)}
@@ -142,12 +146,14 @@ a{color:var(--sky)}
     <div class="grp"><span class="lbl">Cap. min</span>
       <div class="seg" id="capSeg">
         <button data-c="0" class="on">Toutes</button>
+        <button data-c="50000000">50M</button>
         <button data-c="300000000">300M</button>
         <button data-c="2000000000">2B</button>
         <button data-c="10000000000">10B</button>
         <button data-c="50000000000">50B</button>
       </div>
     </div>
+    <label class="toggle" id="tgSurv"><span class="tg"></span>Survivors</label>
     <label class="toggle on" id="tgAuto"><span class="tg"></span>Auto 60s</label>
   </div>
  
@@ -172,6 +178,7 @@ a{color:var(--sky)}
         <th data-s="ratio">×Veille</th>
         <th data-s="dvol">Liquidité $</th>
         <th data-s="mcap">Cap.</th>
+        <th>Qualité</th>
         <th data-s="pos52">Pos. 52s</th>
       </tr></thead>
       <tbody id="rows"></tbody>
@@ -234,10 +241,12 @@ const STATE = {
   rows: [],            // {ticker, price, chg, vol, prev, ratio, dvol}
   range52: {},         // cache 52 semaines par ticker : {low52, high52}
   mcap: {},            // cache capitalisation par ticker ($)
+  qual: {},            // cache qualité par ticker : {rs:bool|null, prof:1|0|null}
   threshold: 2,
   minDvol: 1_000_000,
   minVol: 100_000,     // volume min en ACTIONS aujourd'hui (anti-merguez)
   minMcap: 0,          // capitalisation minimale ($)
+  survivorsOnly: false,// filtre qualité : pas de RS récent, mcap>=50M, profitable
   sortBy: "ratio",
   search: "",
   scanning: false,
@@ -323,11 +332,36 @@ async function fetchMcap(ticker){
   const mc=+r.market_cap||0;
   return mc>0 ? mc : null;
 }
-// récupère position 52s + capitalisation des tickers affichés non encore en cache (concurrence limitée), puis ré-affiche.
+// reverse-split dans les ~365 derniers jours ? (split_to < split_from = inversé)
+async function fetchSplit(ticker){
+  const j=await poly(`/v3/reference/splits?ticker=${encodeURIComponent(ticker)}&limit=10&order=desc&sort=execution_date`);
+  const res=j&&j.results;
+  if(!res||!res.length) return false;
+  const cutoff=Date.now()-365*864e5;
+  for(const s of res){
+    const from=+s.split_from, to=+s.split_to;
+    const ed=s.execution_date? Date.parse(s.execution_date):NaN;
+    if(isFinite(ed) && ed>=cutoff && from>0 && to>0 && to<from) return true;
+  }
+  return false;
+}
+// profitabilité : 1 = bénéficiaire (net income>0 OU résultat opérationnel>0), 0 = non, null = inconnu
+async function fetchProfit(ticker){
+  const j=await poly(`/vX/reference/financials?ticker=${encodeURIComponent(ticker)}&timeframe=annual&limit=1&order=desc&sort=period_of_report_date`);
+  const res=j&&j.results;
+  if(!res||!res.length) return null;
+  const inc=res[0].financials && res[0].financials.income_statement;
+  if(!inc) return null;
+  const ni=inc.net_income_loss && inc.net_income_loss.value;
+  const oi=inc.operating_income_loss && inc.operating_income_loss.value;
+  if(ni==null && oi==null) return null;
+  return ((ni!=null && ni>0) || (oi!=null && oi>0)) ? 1 : 0;
+}
+// enrichit les tickers affichés (52s + capi + reverse-split + profitabilité), en cache, concurrence limitée, puis ré-affiche.
 async function enrich52w(tickers){
-  const todo=tickers.filter(t=>!STATE.range52[t]);
+  const todo=tickers.filter(t=>!STATE.qual[t]);
   if(!todo.length || STATE.enriching) return;
-  STATE.enriching=true; setStatus("52s + capi…",true);
+  STATE.enriching=true; setStatus("qualité…",true);
   let i=0;
   async function worker(){
     while(i<todo.length){
@@ -336,6 +370,10 @@ async function enrich52w(tickers){
       catch(e){ STATE.range52[t]={low52:0,high52:0}; }
       try{ const m=await fetchMcap(t); STATE.mcap[t]= m || 0; }
       catch(e){ STATE.mcap[t]=0; }
+      const q={rs:null, prof:null};
+      try{ q.rs=await fetchSplit(t); }catch(e){ q.rs=null; }
+      try{ q.prof=await fetchProfit(t); }catch(e){ q.prof=null; }
+      STATE.qual[t]=q;
     }
   }
   await Promise.all(Array.from({length:Math.min(8,todo.length)},worker));
@@ -348,6 +386,16 @@ function mcapCell(r){
   if(m==null) return '<span class="pos52">…</span>';
   if(!m) return '<span class="pos52">—</span>';
   return fmtUSD(m);
+}
+// cellule qualité : RS (reverse split récent) + ✓/✗ profitabilité
+function qualCell(r){
+  const q=STATE.qual[r.ticker];
+  if(!q) return '<span class="pos52">…</span>';
+  let out='';
+  if(q.rs===true) out+='<span class="flag rs" title="reverse split récent">RS</span>';
+  if(q.prof===1) out+='<span class="flag ok" title="bénéficiaire">✓</span>';
+  else if(q.prof===0) out+='<span class="flag bad" title="non bénéficiaire">✗</span>';
+  return out || '<span class="pos52">·</span>';
 }
 // cellule position 52s (barre + %), avec ajustement si nouveau plus-haut/bas intraday.
 function pos52Cell(r){
@@ -415,6 +463,13 @@ function render(){
   let rows = STATE.rows.filter(r => {
     if(!((r.vol/r.prev)>=thr && r.vol>=minV && (r.vol*r.price)>=minDv)) return false;
     if(minMc>0){ const m=STATE.mcap[r.ticker]; if(m!=null && m>0 && m<minMc) return false; }
+    if(STATE.survivorsOnly){
+      const qu=STATE.qual[r.ticker], m=STATE.mcap[r.ticker];
+      if(qu && qu.rs===true) return false;             // reverse split récent
+      if(m!=null && m>0 && m<50_000_000) return false; // capi connue < 50M
+      if(qu && qu.prof===0) return false;              // non bénéficiaire (connu)
+      // données inconnues : on garde (ré-évalué après chargement)
+    }
     return true;
   });
   if(q) rows = rows.filter(r => r.ticker.toLowerCase().includes(q));
@@ -427,7 +482,7 @@ function render(){
  
   const tb=$("rows");
   if(!rows.length){
-    tb.innerHTML = `<tr><td colspan="10"><div class="empty">${STATE.rows.length
+    tb.innerHTML = `<tr><td colspan="11"><div class="empty">${STATE.rows.length
       ? "<b>Aucune action</b> au-dessus du seuil pour l'instant.<br>Baisse le seuil, ou la liquidité minimale — et le tableau se remplit au fil de la séance."
       : "<b>Rien encore.</b><br>Connecte ta clé Polygon puis « Scanner »."}</div></td></tr>`;
     return;
@@ -445,6 +500,7 @@ function render(){
       <td><span class="rat ${ratClass(ratio)}">×${ratio.toFixed(2)}</span></td>
       <td>${fmtUSD(dvol)}</td>
       <td>${mcapCell(r)}</td>
+      <td>${qualCell(r)}</td>
       <td>${pos52Cell(r)}</td>
     </tr>`;
   });
@@ -494,6 +550,10 @@ function wire(){
     });
   });
  
+  $("tgSurv").addEventListener("click", ()=>{
+    const t=$("tgSurv"); t.classList.toggle("on");
+    STATE.survivorsOnly=t.classList.contains("on"); render();
+  });
   $("tgAuto").addEventListener("click", ()=>{
     const t=$("tgAuto"); t.classList.toggle("on");
     if(t.classList.contains("on")){ startAuto(); if(STATE.rows.length) scan(); } else stopAuto();
