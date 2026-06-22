@@ -23,7 +23,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:
   background-image:radial-gradient(1200px 600px at 80% -10%,rgba(76,141,255,.06),transparent 60%);padding-bottom:40px}
 .tnum{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .up{color:var(--green)} .dn{color:var(--red)} .flat{color:var(--muted)}
-
+ 
 header{position:sticky;top:0;z-index:30;background:rgba(8,11,20,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
 .hbar{display:flex;align-items:center;gap:10px;padding:11px 12px;max-width:1040px;margin:0 auto}
 .logo{font-weight:800;letter-spacing:.06em;font-size:16px}
@@ -42,13 +42,13 @@ header{position:sticky;top:0;z-index:30;background:rgba(8,11,20,.88);backdrop-fi
 .navbtn{text-decoration:none;border-color:var(--sky);color:var(--sky)}
 .navbtn:hover{border-color:var(--sky);background:rgba(56,189,248,.1)}
 .btn[disabled]{opacity:.45;cursor:not-allowed}
-
+ 
 .keybar{display:flex;gap:8px;align-items:center;padding:10px 12px;max-width:1040px;margin:0 auto;border-bottom:1px solid var(--border);flex-wrap:wrap}
 .keybar input{flex:1;min-width:160px;font-family:var(--mono);font-size:12px;background:var(--bg2);color:var(--text);
   border:1px solid var(--border2);border-radius:8px;padding:9px 10px}
 .keybar input:focus{outline:none;border-color:var(--blue)}
 .keybar .lbl{font-size:11px;color:var(--muted);font-weight:600}
-
+ 
 .wrap{max-width:1040px;margin:0 auto;padding:0 12px}
 .ctrls{display:flex;gap:10px;align-items:center;padding:12px 0 6px;flex-wrap:wrap}
 .grp{display:flex;align-items:center;gap:6px}
@@ -65,20 +65,20 @@ header{position:sticky;top:0;z-index:30;background:rgba(8,11,20,.88);backdrop-fi
 .tg{width:34px;height:19px;border-radius:11px;background:var(--border2);position:relative;transition:.15s;flex:0 0 auto}
 .tg::after{content:"";position:absolute;width:15px;height:15px;border-radius:50%;background:#fff;top:2px;left:2px;transition:.15s}
 .toggle.on .tg{background:var(--blue)} .toggle.on .tg::after{left:17px}
-
+ 
 .bar{display:flex;align-items:center;gap:10px;padding:6px 0 12px;flex-wrap:wrap}
 .count{font-family:var(--mono);font-size:13px;font-weight:700}
 .count b{color:var(--amber)}
 .search{font-family:var(--mono);font-size:12px;background:var(--bg2);color:var(--text);border:1px solid var(--border2);
   border-radius:8px;padding:8px 10px;min-width:140px}
 .search:focus{outline:none;border-color:var(--blue)}
-
+ 
 .prog{display:none;padding:0 0 8px}
 .prog.show{display:block}
 .pbar{height:5px;background:var(--panel2);border-radius:3px;overflow:hidden}
 .pfill{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--ultime2));transition:width .2s}
 .ptxt{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:5px}
-
+ 
 .tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:13px;background:var(--panel)}
 table{width:100%;min-width:660px;border-collapse:collapse;font-family:var(--mono);font-size:12px}
 thead th{position:sticky;top:0;background:var(--panel2);text-align:right;color:var(--muted);font-weight:600;font-size:10px;
@@ -92,6 +92,9 @@ tbody tr:last-child td{border-bottom:none}
 tbody tr:hover{background:rgba(76,141,255,.05)}
 .rat{font-weight:700}
 .rat.x2{color:var(--yellow)} .rat.x3{color:var(--amber)} .rat.x5{color:var(--red)}
+.rangebar{display:inline-block;width:46px;height:6px;background:var(--border2);border-radius:3px;position:relative;vertical-align:middle;margin-right:5px}
+.rangebar i{position:absolute;top:-1px;width:3px;height:8px;background:var(--sky);border-radius:1px}
+.pos52{color:var(--muted);font-size:11px}
 .noliq{color:var(--faint)}
 .empty{text-align:center;color:var(--muted);padding:48px 16px;font-size:13px}
 .empty b{color:var(--text)}
@@ -104,7 +107,7 @@ a{color:var(--sky)}
 </style>
 </head>
 <body>
-
+ 
 <header>
   <div class="hbar">
     <div class="logo">VOL<span class="dot">SCAN</span> <span class="sub">volume marché US</span></div>
@@ -119,7 +122,7 @@ a{color:var(--sky)}
     <button class="btn pri sm" id="connectBtn">Connecter</button>
   </div>
 </header>
-
+ 
 <div class="wrap">
   <div class="ctrls">
     <div class="grp"><span class="lbl">Seuil</span>
@@ -135,16 +138,16 @@ a{color:var(--sky)}
     </div>
     <label class="toggle on" id="tgAuto"><span class="tg"></span>Auto 60s</label>
   </div>
-
+ 
   <div class="prog" id="prog"><div class="pbar"><div class="pfill" id="pfill"></div></div><div class="ptxt" id="ptxt"></div></div>
-
+ 
   <div class="bar">
     <div class="count" id="count"></div>
     <div class="hsp"></div>
     <input class="search" id="search" placeholder="filtrer un ticker…">
     <span class="hstat" id="lastMaj"></span>
   </div>
-
+ 
   <div class="tablewrap">
     <table>
       <thead><tr>
@@ -156,19 +159,20 @@ a{color:var(--sky)}
         <th data-s="prev">Vol veille</th>
         <th data-s="ratio">×Veille</th>
         <th data-s="dvol">Liquidité $</th>
+        <th data-s="pos52">Pos. 52s</th>
       </tr></thead>
       <tbody id="rows"></tbody>
     </table>
   </div>
-
+ 
   <footer>
     Balaye toutes les actions US (snapshot Polygon, 1 appel) et liste celles dont le volume du jour dépasse le seuil ×&nbsp;la veille.<br>
     Données différées ~15&nbsp;min — le volume du jour est un cumul partiel tant que la séance n'est pas finie. Outil de détection, pas un conseil en investissement.
   </footer>
 </div>
-
+ 
 <div class="toast" id="toast"></div>
-
+ 
 <script>
 "use strict";
 /* ============================================================
@@ -182,7 +186,7 @@ const CONFIG = {
   REFRESH_SECONDS: 60,
   MAX_ROWS: 200,          // sécurité d'affichage (les jours chargés peuvent sortir des centaines de tickers)
 };
-
+ 
 const $ = id => document.getElementById(id);
 const sleep = ms => new Promise(r=>setTimeout(r,ms));
 const fmtPct = v => (v>=0?"+":"")+(v*100).toFixed(2)+"%";
@@ -202,27 +206,29 @@ function fmtUSD(v){
   return "$"+Math.round(v);
 }
 function ymd(d){ return d.toISOString().slice(0,10); }
-
+ 
 // clé partagée avec le scanner principal (même origine GitHub Pages)
 let MEM_KEY="";
 function getKey(){ try{ const k=localStorage.getItem("sectorscan_key"); if(k) return k; }catch(e){} return MEM_KEY; }
 function setKey(k){ MEM_KEY=k||""; try{ if(k) localStorage.setItem("sectorscan_key",k); }catch(e){} }
-
+ 
 let toastTimer=null;
 function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),2600); }
 function setStatus(txt,on){ $("statusTxt").textContent=txt; $("pulse").classList.toggle("on",!!on); }
 function stampMaj(){ $("lastMaj").textContent="MAJ "+new Date().toLocaleTimeString("fr-FR"); }
-
+ 
 const STATE = {
   rows: [],            // {ticker, price, chg, vol, prev, ratio, dvol}
+  range52: {},         // cache 52 semaines par ticker : {low52, high52}
   threshold: 2,
   minDvol: 1_000_000,
   sortBy: "ratio",
   search: "",
   scanning: false,
+  enriching: false,
   autoTimer: null,
 };
-
+ 
 /* ---------------- Polygon ---------------- */
 async function poly(path){
   const key=getKey();
@@ -239,7 +245,7 @@ async function poly(path){
   }
   throw new Error("échec après retries");
 }
-
+ 
 // snapshot marché complet → {ticker: {dayVol, prevVol, price, chg}}
 async function fetchSnapshot(){
   const j = await poly(`/v2/snapshot/locale/us/markets/stocks/tickers`);
@@ -256,7 +262,7 @@ async function fetchSnapshot(){
   }
   return out;
 }
-
+ 
 // repli : 2 derniers jours via grouped-daily (si snapshot non exposé par l'abonnement)
 async function fetchGroupedFallback(){
   const days=[];
@@ -278,7 +284,49 @@ async function fetchGroupedFallback(){
   }
   return out;
 }
-
+ 
+/* ---------------- 52 semaines ---------------- */
+// high/low sur ~1 an pour un ticker (mis en cache, ne bouge quasi pas en séance).
+async function fetch52w(ticker){
+  const to=ymd(new Date());
+  const from=ymd(new Date(Date.now()-372*864e5));
+  const j=await poly(`/v2/aggs/ticker/${encodeURIComponent(ticker)}/range/1/day/${from}/${to}?adjusted=true&sort=asc&limit=400`);
+  const res=j&&j.results;
+  if(!res||!res.length) return null;
+  let lo=Infinity,hi=-Infinity;
+  for(const b of res){ if(b.l<lo)lo=b.l; if(b.h>hi)hi=b.h; }
+  if(!isFinite(lo)||!isFinite(hi)||hi<=lo) return null;
+  return {low52:lo, high52:hi};
+}
+// récupère la position 52s des tickers affichés non encore en cache (concurrence limitée), puis ré-affiche.
+async function enrich52w(tickers){
+  const todo=tickers.filter(t=>!STATE.range52[t]);
+  if(!todo.length || STATE.enriching) return;
+  STATE.enriching=true; setStatus("positions 52s…",true);
+  let i=0;
+  async function worker(){
+    while(i<todo.length){
+      const t=todo[i++];
+      try{ const r=await fetch52w(t); STATE.range52[t]= r || {low52:0,high52:0}; }
+      catch(e){ STATE.range52[t]={low52:0,high52:0}; }
+    }
+  }
+  await Promise.all(Array.from({length:Math.min(8,todo.length)},worker));
+  STATE.enriching=false; setStatus("en ligne",true);
+  render();
+}
+// cellule position 52s (barre + %), avec ajustement si nouveau plus-haut/bas intraday.
+function pos52Cell(r){
+  const rg=STATE.range52[r.ticker];
+  if(!rg) return '<span class="pos52">…</span>';
+  let lo=rg.low52, hi=rg.high52;
+  if(!(hi>lo)) return '<span class="pos52">—</span>';
+  if(r.price>hi) hi=r.price;
+  if(r.price>0 && r.price<lo) lo=r.price;
+  const pct=Math.round(Math.max(0,Math.min(1,(r.price-lo)/(hi-lo)))*100);
+  return `<span class="rangebar"><i style="left:${Math.max(0,Math.min(96,pct))}%"></i></span><span class="pos52">${pct}%</span>`;
+}
+ 
 /* ---------------- scan ---------------- */
 async function scan(){
   if(STATE.scanning) return;
@@ -306,7 +354,7 @@ async function scan(){
     else { setStatus("erreur",false); toast("Échec : "+e.message); }
   }
 }
-
+ 
 /* ---------------- rendu ---------------- */
 function ratClass(r){ return r>=5?"x5":r>=3?"x3":"x2"; }
 function sortRows(rows){
@@ -318,6 +366,7 @@ function sortRows(rows){
     dvol:  r=>r.vol*r.price,
     chg:   r=>r.chg,
     price: r=>r.price,
+    pos52: r=>{ const g=STATE.range52[r.ticker]; if(!g||!(g.high52>g.low52)) return -1; return (r.price-g.low52)/(g.high52-g.low52); },
     ticker:r=>r.ticker,
   }[s] || (r=>r.vol/r.prev);
   const arr=[...rows];
@@ -331,14 +380,14 @@ function render(){
   if(q) rows = rows.filter(r => r.ticker.toLowerCase().includes(q));
   const total=rows.length;
   rows = sortRows(rows).slice(0, CONFIG.MAX_ROWS);
-
+ 
   $("count").innerHTML = STATE.rows.length
     ? `<b>${total}</b> action${total>1?'s':''} ≥ ×${thr} la veille${total>CONFIG.MAX_ROWS?` (top ${CONFIG.MAX_ROWS} affichés)`:''}`
     : "";
-
+ 
   const tb=$("rows");
   if(!rows.length){
-    tb.innerHTML = `<tr><td colspan="8"><div class="empty">${STATE.rows.length
+    tb.innerHTML = `<tr><td colspan="9"><div class="empty">${STATE.rows.length
       ? "<b>Aucune action</b> au-dessus du seuil pour l'instant.<br>Baisse le seuil, ou la liquidité minimale — et le tableau se remplit au fil de la séance."
       : "<b>Rien encore.</b><br>Connecte ta clé Polygon puis « Scanner »."}</div></td></tr>`;
     return;
@@ -355,15 +404,17 @@ function render(){
       <td class="flat">${fmtNum(r.prev)}</td>
       <td><span class="rat ${ratClass(ratio)}">×${ratio.toFixed(2)}</span></td>
       <td>${fmtUSD(dvol)}</td>
+      <td>${pos52Cell(r)}</td>
     </tr>`;
   });
   tb.innerHTML=html;
+  enrich52w(rows.map(r=>r.ticker));   // récupère les positions 52s manquantes puis ré-affiche
 }
-
+ 
 /* ---------------- auto ---------------- */
 function startAuto(){ stopAuto(); STATE.autoTimer=setInterval(()=>{ if(!STATE.scanning) scan(); }, CONFIG.REFRESH_SECONDS*1000); }
 function stopAuto(){ if(STATE.autoTimer){ clearInterval(STATE.autoTimer); STATE.autoTimer=null; } }
-
+ 
 /* ---------------- wiring ---------------- */
 function wire(){
   const saved=getKey(); if(saved) $("keyInput").value=saved;
@@ -373,20 +424,20 @@ function wire(){
     setKey(k); $("rescanBtn").disabled=false; scan();
   });
   $("rescanBtn").addEventListener("click", scan);
-
+ 
   $("thrSeg").addEventListener("click", e=>{
     const b=e.target.closest("button"); if(!b) return;
     document.querySelectorAll("#thrSeg button").forEach(x=>x.classList.remove("on"));
     b.classList.add("on"); STATE.threshold=parseFloat(b.dataset.t); render();
   });
   $("minDvol").addEventListener("input", e=>{ STATE.minDvol=Math.max(0, +e.target.value||0); render(); });
-
+ 
   let st=null;
   $("search").addEventListener("input", e=>{
     clearTimeout(st); const v=e.target.value.toLowerCase().trim();
     st=setTimeout(()=>{ STATE.search=v; render(); },150);
   });
-
+ 
   document.querySelectorAll("thead th").forEach(th=>{
     th.addEventListener("click", ()=>{
       const s=th.dataset.s; if(!s||s==="rank") return;
@@ -395,14 +446,14 @@ function wire(){
       th.classList.add("on"); render();
     });
   });
-
+ 
   $("tgAuto").addEventListener("click", ()=>{
     const t=$("tgAuto"); t.classList.toggle("on");
     if(t.classList.contains("on")){ startAuto(); if(STATE.rows.length) scan(); } else stopAuto();
   });
   document.addEventListener("visibilitychange", ()=>{ if(!document.hidden && $("tgAuto").classList.contains("on") && !STATE.scanning) scan(); });
 }
-
+ 
 /* ---------------- init ---------------- */
 (function init(){
   wire();
