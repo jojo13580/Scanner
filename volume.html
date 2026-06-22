@@ -153,6 +153,13 @@ a{color:var(--sky)}
         <button data-c="50000000000">50B</button>
       </div>
     </div>
+    <div class="grp"><span class="lbl">Sens</span>
+      <div class="seg" id="dirSeg">
+        <button data-d="all">Tout</button>
+        <button data-d="up" class="on">Hausse</button>
+        <button data-d="soft">+ flat</button>
+      </div>
+    </div>
     <label class="toggle" id="tgSurv"><span class="tg"></span>Survivors</label>
     <label class="toggle on" id="tgAuto"><span class="tg"></span>Auto 60s</label>
   </div>
@@ -247,6 +254,7 @@ const STATE = {
   minVol: 100_000,     // volume min en ACTIONS aujourd'hui (anti-merguez)
   minMcap: 0,          // capitalisation minimale ($)
   survivorsOnly: false,// filtre qualité : pas de RS récent, mcap>=50M, profitable
+  direction: "up",     // sens : "all" tout · "up" hausse seule (chg>0) · "soft" hausse+flat (chg>-1%)
   sortBy: "ratio",
   search: "",
   scanning: false,
@@ -462,6 +470,9 @@ function render(){
   const thr=STATE.threshold, minDv=STATE.minDvol, minV=STATE.minVol, minMc=STATE.minMcap, q=STATE.search;
   let rows = STATE.rows.filter(r => {
     if(!((r.vol/r.prev)>=thr && r.vol>=minV && (r.vol*r.price)>=minDv)) return false;
+    // filtre SENS du jour (vire les actions en négatif)
+    if(STATE.direction==="up"   && !(r.chg>0))     return false;
+    if(STATE.direction==="soft" && !(r.chg>-0.01)) return false; // garde flat / quasi-flat
     if(minMc>0){ const m=STATE.mcap[r.ticker]; if(m!=null && m>0 && m<minMc) return false; }
     if(STATE.survivorsOnly){
       const qu=STATE.qual[r.ticker], m=STATE.mcap[r.ticker];
@@ -534,6 +545,11 @@ function wire(){
     document.querySelectorAll("#capSeg button").forEach(x=>x.classList.remove("on"));
     b.classList.add("on"); STATE.minMcap=parseFloat(b.dataset.c)||0; render();
   });
+  $("dirSeg").addEventListener("click", e=>{
+    const b=e.target.closest("button"); if(!b) return;
+    document.querySelectorAll("#dirSeg button").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on"); STATE.direction=b.dataset.d; render();
+  });
  
   let st=null;
   $("search").addEventListener("input", e=>{
@@ -570,3 +586,4 @@ function wire(){
 </script>
 </body>
 </html>
+ 
