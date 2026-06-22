@@ -133,6 +133,9 @@ a{color:var(--sky)}
         <button data-t="5">×5</button>
       </div>
     </div>
+    <div class="grp"><span class="lbl">Vol min (actions)</span>
+      <input class="numin" id="minVol" type="number" value="100000" step="50000" min="0">
+    </div>
     <div class="grp"><span class="lbl">Liquidité min ($/j)</span>
       <input class="numin" id="minDvol" type="number" value="1000000" step="500000" min="0">
     </div>
@@ -222,6 +225,7 @@ const STATE = {
   range52: {},         // cache 52 semaines par ticker : {low52, high52}
   threshold: 2,
   minDvol: 1_000_000,
+  minVol: 100_000,     // volume min en ACTIONS aujourd'hui (anti-merguez)
   sortBy: "ratio",
   search: "",
   scanning: false,
@@ -375,8 +379,8 @@ function sortRows(rows){
   return arr;
 }
 function render(){
-  const thr=STATE.threshold, minDv=STATE.minDvol, q=STATE.search;
-  let rows = STATE.rows.filter(r => (r.vol/r.prev)>=thr && (r.vol*r.price)>=minDv);
+  const thr=STATE.threshold, minDv=STATE.minDvol, minV=STATE.minVol, q=STATE.search;
+  let rows = STATE.rows.filter(r => (r.vol/r.prev)>=thr && r.vol>=minV && (r.vol*r.price)>=minDv);
   if(q) rows = rows.filter(r => r.ticker.toLowerCase().includes(q));
   const total=rows.length;
   rows = sortRows(rows).slice(0, CONFIG.MAX_ROWS);
@@ -430,6 +434,7 @@ function wire(){
     document.querySelectorAll("#thrSeg button").forEach(x=>x.classList.remove("on"));
     b.classList.add("on"); STATE.threshold=parseFloat(b.dataset.t); render();
   });
+  $("minVol").addEventListener("input", e=>{ STATE.minVol=Math.max(0, +e.target.value||0); render(); });
   $("minDvol").addEventListener("input", e=>{ STATE.minDvol=Math.max(0, +e.target.value||0); render(); });
  
   let st=null;
